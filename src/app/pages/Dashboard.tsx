@@ -134,7 +134,7 @@ export function Dashboard() {
         {/* New Trip Button */}
         <button
           onClick={() => setShowNewTripModal(true)}
-          className="w-full sm:w-auto mb-8 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+          className="w-full sm:w-auto mb-8 bg-blue-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
         >
           <Plus className="w-5 h-5" />
           Creează călătorie nouă
@@ -202,7 +202,7 @@ export function Dashboard() {
               </p>
               <button
                 onClick={() => setShowNewTripModal(true)}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-blue-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Creează prima călătorie
               </button>
@@ -247,13 +247,13 @@ export function Dashboard() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowNewTripModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 font-bold"
               >
                 Anulează
               </button>
               <Link
                 to="/trip/4"
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-center"
+                className="flex-1 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors text-center"
               >
                 Creează
               </Link>

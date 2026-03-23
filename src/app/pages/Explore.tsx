@@ -191,7 +191,7 @@ export function Explore() {
             </div>
             <Link
               to={`/trip/${id}`}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-blue-600 hover:text-blue-700 font-bold"
             >
               ← Înapoi la călătorie
             </Link>
@@ -214,7 +214,7 @@ export function Explore() {
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                  className={`font-bold px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
                     selectedCategory === category
                       ? "bg-blue-600 text-white"
                       : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -315,7 +315,7 @@ export function Explore() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleVote(attraction.id, "up")}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors ${
+                        className={`font-bold flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors ${
                           attraction.userVote === "up"
                             ? "bg-green-100 text-green-700"
                             : "bg-gray-100 text-gray-600 hover:bg-green-50"
@@ -326,7 +326,7 @@ export function Explore() {
                       </button>
                       <button
                         onClick={() => handleVote(attraction.id, "down")}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors ${
+                        className={`font-bold flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors ${
                           attraction.userVote === "down"
                             ? "bg-red-100 text-red-700"
                             : "bg-gray-100 text-gray-600 hover:bg-red-50"

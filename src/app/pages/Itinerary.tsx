@@ -232,11 +232,11 @@ export function Itinerary() {
               </p>
             </div>
             <div className="flex gap-2">
-              <button className="bg-white bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors flex items-center gap-2">
+              <button className="bg-white font-bold bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors flex items-center gap-2">
                 <Download className="w-4 h-4" />
                 <span className="hidden sm:inline">Export PDF</span>
               </button>
-              <button className="bg-white bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors flex items-center gap-2">
+              <button className="bg-white font-bold bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors flex items-center gap-2">
                 <Share2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Distribuie</span>
               </button>
@@ -382,11 +382,11 @@ export function Itinerary() {
             faci rezervări pentru activitățile planificate.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
+            <button className="bg-white font-bold text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
               <Download className="w-5 h-5" />
               Descarcă itinerarul
             </button>
-            <button className="bg-white bg-opacity-20 backdrop-blur-sm px-6 py-3 rounded-lg hover:bg-opacity-30 transition-colors flex items-center justify-center gap-2">
+            <button className="bg-white font-bold bg-opacity-20 backdrop-blur-sm px-6 py-3 rounded-lg hover:bg-opacity-30 transition-colors flex items-center justify-center gap-2">
               Începe rezervările
               <ChevronRight className="w-5 h-5" />
             </button>

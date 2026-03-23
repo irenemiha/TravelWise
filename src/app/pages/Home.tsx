@@ -41,7 +41,7 @@ export function Home() {
               </span>
             </h1>
             
-            <p className="text-lg sm:text-2xl text-gray-200 mb-10 drop-shadow-md font-light leading-relaxed">
+            <p className="text-lg sm:text-2xl text-gray-200 mb-10 drop-shadow-md font-bold leading-relaxed">
               Votează destinații, creează itinerarii și ia decizii împreună cu
               prietenii tăi - totul într-un singur loc, fără stres.
             </p>
@@ -49,14 +49,14 @@ export function Home() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 to="/dashboard"
-                className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-600/30 transition-all gap-2"
+                className="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-600/30 transition-all gap-2"
               >
                 Începe gratuit
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <a
                 href="#features"
-                className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold rounded-xl text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all shadow-xl"
+                className="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-xl text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all shadow-xl"
               >
                 Cum funcționează
               </a>
@@ -267,7 +267,7 @@ export function Home() {
           </p>
           <Link
             to="/dashboard"
-            className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-blue-50 transition-colors"
+            className="inline-block font-bold bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-blue-50 transition-colors"
           >
             Creează prima ta călătorie
           </Link>

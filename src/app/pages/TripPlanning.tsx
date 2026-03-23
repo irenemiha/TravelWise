@@ -82,11 +82,11 @@ export function TripPlanning() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button className="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors backdrop-blur-sm flex items-center gap-2">
+              <button className="bg-white bg-opacity-20 font-bold text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors backdrop-blur-sm flex items-center gap-2">
                 <Share2 className="w-4 h-4" />
                 <span className="hidden sm:inline">Distribuie</span>
               </button>
-              <button className="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors backdrop-blur-sm">
+              <button className="bg-white bg-opacity-20 font-bold text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors backdrop-blur-sm">
                 <Settings className="w-4 h-4" />
               </button>
             </div>
@@ -98,18 +98,18 @@ export function TripPlanning() {
         {/* Navigation Tabs */}
         <div className="bg-white rounded-xl shadow-sm mb-6 overflow-x-auto">
           <div className="flex border-b border-gray-200">
-            <button className="px-6 py-4 border-b-2 border-blue-600 text-blue-600 whitespace-nowrap">
+            <button className="px-6 py-4 font-bold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap">
               Prezentare generală
             </button>
             <Link
               to={`/explore/${id}`}
-              className="px-6 py-4 border-b-2 border-transparent text-gray-600 hover:text-gray-900 whitespace-nowrap"
+              className="px-6 py-4 font-bold border-b-2 border-transparent text-gray-600 hover:text-gray-900 whitespace-nowrap"
             >
               Explorează atracții
             </Link>
             <Link
               to={`/itinerary/${id}`}
-              className="px-6 py-4 border-b-2 border-transparent text-gray-600 hover:text-gray-900 whitespace-nowrap"
+              className="px-6 py-4 font-bold border-b-2 border-transparent text-gray-600 hover:text-gray-900 whitespace-nowrap"
             >
               Itinerariu
             </Link>
@@ -128,14 +128,14 @@ export function TripPlanning() {
                   className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-600 hover:bg-blue-50 transition-colors group"
                 >
                   <MapPin className="w-8 h-8 text-blue-600 mb-2" />
-                  <h3 className="mb-1 text-gray-900">Explorează atracții</h3>
+                  <h3 className="mb-1 text-gray-900 font-bold">Explorează atracții</h3>
                   <p className="text-sm text-gray-600">
                     Descoperă obiective turistice
                   </p>
                 </Link>
                 <button className="p-4 border-2 border-gray-200 rounded-lg hover:border-purple-600 hover:bg-purple-50 transition-colors text-left group">
                   <Users className="w-8 h-8 text-purple-600 mb-2" />
-                  <h3 className="mb-1 text-gray-900">Votează atracții</h3>
+                  <h3 className="mb-1 text-gray-900 font-bold">Votează atracții</h3>
                   <p className="text-sm text-gray-600">
                     Alege preferatele tale
                   </p>
@@ -145,14 +145,14 @@ export function TripPlanning() {
                   className="p-4 border-2 border-gray-200 rounded-lg hover:border-green-600 hover:bg-green-50 transition-colors group"
                 >
                   <Calendar className="w-8 h-8 text-green-600 mb-2" />
-                  <h3 className="mb-1 text-gray-900">Vezi itinerarul</h3>
+                  <h3 className="mb-1 text-gray-900 font-bold">Vezi itinerarul</h3>
                   <p className="text-sm text-gray-600">
                     Planul generat automat
                   </p>
                 </Link>
                 <button className="p-4 border-2 border-gray-200 rounded-lg hover:border-orange-600 hover:bg-orange-50 transition-colors text-left group">
                   <Share2 className="w-8 h-8 text-orange-600 mb-2" />
-                  <h3 className="mb-1 text-gray-900">Distribuie</h3>
+                  <h3 className="mb-1 text-gray-900 font-bold">Distribuie</h3>
                   <p className="text-sm text-gray-600">
                     Invită mai mulți prieteni
                   </p>
@@ -258,10 +258,10 @@ export function TripPlanning() {
             {/* Members */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl text-gray-900">Membri</h2>
+                <h2 className="text-xl text-gray-900 font-bold">Membri</h2>
                 <button
                   onClick={() => setShowInviteModal(true)}
-                  className="text-blue-600 hover:text-blue-700"
+                  className="text-blue-600 hover:text-blue-700 font-bold"
                 >
                   <UserPlus className="w-5 h-5" />
                 </button>
@@ -318,7 +318,7 @@ export function TripPlanning() {
               </div>
               <Link
                 to={`/explore/${id}`}
-                className="mt-4 block w-full bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors text-center flex items-center justify-center gap-2"
+                className="mt-4 block w-full font-bold bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors text-center flex items-center justify-center gap-2"
               >
                 Continuă planificarea
                 <ArrowRight className="w-4 h-4" />
@@ -342,11 +342,11 @@ export function TripPlanning() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowInviteModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+                className="flex-1 px-4 py-2 border font-bold border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
               >
                 Închide
               </button>
-              <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <button className="flex-1 px-4 py-2 font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                 Copiază link
               </button>
             </div>

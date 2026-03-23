@@ -1,7 +1,7 @@
 
-  # TravelWise website and app
+  # TravelWise
 
-  This is a code bundle for TravelWise website and app. The original project is available at https://www.figma.com/design/POHVYedH2qO0n5lXfChXLi/TravelWise-website-and-app.
+  This is a code bundle for TravelWise. The original project is available at https://www.figma.com/design/POHVYedH2qO0n5lXfChXLi/TravelWise.
 
   ## Running the code
 

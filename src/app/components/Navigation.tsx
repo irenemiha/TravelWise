@@ -23,7 +23,7 @@ export function Navigation() {
           <div className="hidden md:flex items-center gap-6">
             <Link
               to="/"
-              className={`transition-colors ${
+              className={`font-bold transition-colors ${
                 isHome ? "text-blue-600" : "text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -31,7 +31,7 @@ export function Navigation() {
             </Link>
             <Link
               to="/dashboard"
-              className={`transition-colors ${
+              className={`font-bold transition-colors ${
                 location.pathname.includes("dashboard")
                   ? "text-blue-600"
                   : "text-gray-600 hover:text-gray-900"
@@ -41,7 +41,7 @@ export function Navigation() {
             </Link>
             <Link
               to="/dashboard"
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="font-bold bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
               Începe o călătorie
             </Link>
@@ -67,7 +67,7 @@ export function Navigation() {
               <Link
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`transition-colors ${
+                className={`font-bold transition-colors ${
                   isHome ? "text-blue-600" : "text-gray-600"
                 }`}
               >
@@ -76,7 +76,7 @@ export function Navigation() {
               <Link
                 to="/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
-                className={`transition-colors ${
+                className={`font-bold transition-colors ${
                   location.pathname.includes("dashboard")
                     ? "text-blue-600"
                     : "text-gray-600"
@@ -87,7 +87,7 @@ export function Navigation() {
               <Link
                 to="/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
+                className="font-bold bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
               >
                 Începe o călătorie
               </Link>
