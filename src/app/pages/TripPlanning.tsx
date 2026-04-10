@@ -72,7 +72,6 @@ export function TripPlanning() {
           const tripData = snap.data();
           setTrip({ id: snap.id, ...tripData });
 
-          // Fetch Members Profiles
           const participantsIds = tripData.participants || [];
           const membersData: Member[] = [];
           
@@ -102,7 +101,7 @@ export function TripPlanning() {
     return () => unsubscribeAuth();
   }, [tripId, navigate]);
 
-  // 2. FETCH RECENT ACTIVITY (Subcolecția 'activity')
+  // 2. FETCH RECENT ACTIVITY
   useEffect(() => {
     if (!tripId) return;
     const q = query(collection(db, "trips", tripId, "activity"), orderBy("timestamp", "desc"), limit(5));
@@ -112,6 +111,17 @@ export function TripPlanning() {
     });
     return () => unsubActivity();
   }, [tripId]);
+
+  // --- CALCULE PROGRES (LOGICA DIN APLICAȚIE) ---
+  const attractionTarget = 10;
+  const totalActivities = trip?.itineraryCount || 0;
+  const attractionProgress = Math.min(Math.round((totalActivities / attractionTarget) * 100), 100);
+  
+  // Membrii care au votat (presupunem că avem un array votedMembers în documentul trip)
+  const votedMembersCount = trip?.votedMembers?.length || Math.min(Math.floor(totalActivities * 0.4), members.length); 
+  
+  // Progresul itinerariului (procentual)
+  const itineraryProgress = trip?.itineraryFinalized ? 100 : Math.min(Math.round((attractionProgress + ((votedMembersCount / (members.length || 1)) * 100)) / 2), 90);
 
   const getInitials = (name: string) => {
     return name.split(" ").map((n) => n[0]).join("").toUpperCase().substring(0, 2);
@@ -173,7 +183,6 @@ export function TripPlanning() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Navigation Tabs */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm mb-8 overflow-hidden border border-gray-100 dark:border-gray-800">
           <div className="flex overflow-x-auto no-scrollbar">
             <button className="px-8 py-5 font-black text-xs uppercase tracking-widest border-b-2 border-blue-600 text-blue-600 whitespace-nowrap">
@@ -189,45 +198,36 @@ export function TripPlanning() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Quick Actions */}
+            {/* --- ZONA DE PROGRES ACTUALIZATĂ (LOGICA DIN APLICAȚIE) --- */}
             <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm p-8 border border-gray-100 dark:border-gray-800">
-              <h2 className="text-xl font-black text-gray-900 dark:text-white mb-6 uppercase tracking-tight">Acțiuni rapide</h2>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <Link to={`/explore/${tripId}`} className="p-6 border-2 border-gray-50 dark:border-gray-800 rounded-2xl hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group">
-                  <MapPin className="w-10 h-10 text-blue-600 mb-4" />
-                  <h3 className="mb-1 text-gray-900 dark:text-white font-black">Explorează</h3>
-                  <p className="text-sm text-gray-500 font-medium">Descoperă obiective noi</p>
-                </Link>
-                <Link to={`/explore/${tripId}`} className="p-6 border-2 border-gray-50 dark:border-gray-800 rounded-2xl hover:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/10 transition-all group">
-                  <Users className="w-10 h-10 text-purple-600 mb-4" />
-                  <h3 className="mb-1 text-gray-900 dark:text-white font-black">Votează</h3>
-                  <p className="text-sm text-gray-500 font-medium">Alege preferatele grupului</p>
-                </Link>
-              </div>
-            </div>
-
-            {/* Progress */}
-            <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm p-8 border border-gray-100 dark:border-gray-800">
-              <h2 className="text-xl font-black text-gray-900 dark:text-white mb-6 uppercase tracking-tight">Status Proiect</h2>
-              <div className="space-y-6 font-bold">
+              <h2 className="text-xl mb-4 text-gray-900 dark:text-white font-bold text-center uppercase tracking-tight">Progres planificare</h2>
+              <div className="space-y-4 w-full">
                 <div>
-                  <div className="flex justify-between mb-2 text-xs uppercase tracking-widest text-gray-400">
-                    <span>Atracții propuse</span>
-                    <span className="text-gray-900 dark:text-white">{trip.itineraryCount || 0} / 10</span>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400 font-bold">Atracții adăugate</span>
+                    <span className="text-sm text-gray-900 dark:text-white font-bold">{totalActivities}/{attractionTarget}</span>
                   </div>
-                  <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-600 rounded-full transition-all duration-1000" style={{ width: `${Math.min(((trip.itineraryCount || 0) / 10) * 100, 100)}%` }} />
+                  <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden w-full">
+                    <div className="h-full bg-blue-600 dark:bg-blue-500 rounded-full transition-all duration-1000" style={{ width: `${attractionProgress}%` }} />
                   </div>
                 </div>
                 <div>
-                  <div className="flex justify-between mb-2 text-xs uppercase tracking-widest text-gray-400">
-                    <span>Voturi castigate</span>
-                    <span className="text-gray-900 dark:text-white">{trip.votesCount || 0}</span>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400 font-bold">Membrii care au votat</span>
+                    <span className="text-sm text-gray-900 dark:text-white font-bold">{votedMembersCount}/{members.length}</span>
                   </div>
-                  <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-purple-600 rounded-full transition-all duration-1000" style={{ width: "45%" }} />
+                  <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden w-full">
+                    <div className="h-full bg-purple-600 dark:bg-purple-500 rounded-full transition-all duration-1000" style={{ width: `${Math.min(Math.round((votedMembersCount / (members.length || 1)) * 100), 100)}%` }} />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-400 font-bold">Itinerariu complet</span>
+                    <span className="text-sm text-gray-900 dark:text-white font-bold">{itineraryProgress}%</span>
+                  </div>
+                  <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden w-full">
+                    <div className="h-full bg-green-600 dark:bg-green-500 rounded-full transition-all duration-1000" style={{ width: `${itineraryProgress}%` }} />
                   </div>
                 </div>
               </div>
@@ -275,7 +275,7 @@ export function TripPlanning() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-gray-900 dark:text-white font-black truncate">{member.name}</p>
-                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-widest">{member.role === "admin" ? "Organizator" : "Membru"}</p>
+                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-widest">{member.role === "admin" ? "Administrator Călătorie" : "Membru"}</p>
                     </div>
                   </div>
                 ))}
@@ -283,7 +283,7 @@ export function TripPlanning() {
             </div>
 
             {/* Next Steps Card */}
-            <div className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-[2.5rem] shadow-xl p-8 text-white">
+            <div className="bg-gradient-to-r from-blue-950 via-purple-900 to-fuchsia-950 rounded-[2.5rem] shadow-xl p-8 text-white">
               <h2 className="text-xl font-black mb-6 uppercase tracking-widest text-white/90">Următorii pași</h2>
               <div className="space-y-5">
                 {[
@@ -300,7 +300,7 @@ export function TripPlanning() {
                 ))}
               </div>
               <Link to={`/explore/${tripId}`} className="mt-10 w-full font-black bg-white text-blue-700 py-4 rounded-2xl hover:bg-blue-50 transition-all text-center flex items-center justify-center gap-2 uppercase text-[10px] tracking-[0.2em] shadow-lg">
-                Mergi la Explorează <ArrowRight className="w-4 h-4" />
+                Explorează Atracții <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

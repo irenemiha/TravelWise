@@ -221,7 +221,7 @@ export function Explore() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tighter">
                 Explorează {trip?.destination?.split(',')[0]}
               </h1>
               <p className="text-gray-500 dark:text-gray-400 font-medium">Sincronizat live cu grupul tău</p>
@@ -249,7 +249,7 @@ export function Explore() {
                   onClick={() => setSelectedCategory(cat)}
                   className={`font-black px-6 py-4 rounded-2xl whitespace-nowrap transition-all text-xs uppercase tracking-widest ${
                     selectedCategory === cat
-                      ? "bg-blue-600 text-white shadow-xl shadow-blue-500/20"
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
                       : "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400"
                   }`}
                 >
@@ -265,11 +265,11 @@ export function Explore() {
         {/* Statistics Bar */}
         <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 mb-8 border border-gray-100 dark:border-gray-800 flex items-center justify-between shadow-sm">
           <div className="flex gap-10">
-            <div>
+            <div className="flex flex-col items-center">
               <div className="text-2xl font-black text-blue-600">{userSavedIds.length}</div>
               <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Salvate</div>
             </div>
-            <div>
+            <div className="flex flex-col items-center">
               <div className="text-2xl font-black text-purple-600">{attractions.length}</div>
               <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Disponibile</div>
             </div>

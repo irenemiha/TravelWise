@@ -108,7 +108,7 @@ export function NewTrip() {
   const isFormValid = name && destination && startDate && endDate && !isCreating;
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-950 transition-colors duration-300 min-h-[calc(100vh-64px)] flex flex-col items-center py-12 px-4 overflow-x-hidden">
+    <div className="bg-gradient-to-r from-blue-950 via-purple-900 to-fuchsia-950 transition-colors duration-300 min-h-[calc(100vh-64px)] flex flex-col items-center py-12 px-4 overflow-x-hidden">
       
       {/* BADGE ANIMAT COPIERE */}
       <AnimatePresence>
@@ -128,7 +128,7 @@ export function NewTrip() {
             <div className="w-16 h-16 rounded-3xl bg-blue-600 flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20">
                 <Compass className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">Planifică o aventură</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">Planifică o aventură</h1>
             <p className="text-gray-500 dark:text-gray-400 font-medium">Creează o nouă călătorie și invită-ți prietenii!</p>
         </div>
         
@@ -145,7 +145,7 @@ export function NewTrip() {
 
           {/* Destinație cu Autocomplete */}
           <div className="space-y-2 relative">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Destinația</label>
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Destinația principală</label>
             <div className="relative group">
               <input 
                 type="text" value={destination} onFocus={() => setShowDropdown(true)}

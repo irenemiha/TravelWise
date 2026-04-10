@@ -20,27 +20,37 @@ export function NotificationDropdown() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!auth.currentUser) return;
+    // 1. DACĂ NU EXISTĂ USER, NU PORNI ASCULTAREA SAU OPREȘTE-O PE CEA EXISTENTĂ
+    if (!auth.currentUser) {
+      setNotifications([]);
+      return;
+    }
 
-    // Ascultăm notificările userului (ultimele 10)
+    const currentUserId = auth.currentUser.uid;
+
     const q = query(
-      collection(db, "users", auth.currentUser.uid, "notifications"),
+      collection(db, "users", currentUserId, "notifications"),
       orderBy("createdAt", "desc"),
       limit(10)
     );
 
+    // 2. ADĂUGĂM LOGICĂ DE CATCH PENTRU ERORI DE PERMISIUNI LA LOGOUT
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       })) as Notification[];
       setNotifications(data);
+    }, (error) => {
+      // Ignorăm erorile de tip 'permission-denied' care se întâmplă în milisecunda în care userul dă logout
+      if (error.code !== 'permission-denied') {
+        console.error("Notif fetch error:", error);
+      }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [auth.currentUser]); // Re-executăm când starea auth se schimbă
 
-  // Închidere la click în exterior
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -55,14 +65,22 @@ export function NotificationDropdown() {
 
   const markAsRead = async (id: string) => {
     if (!auth.currentUser) return;
-    const notifRef = doc(db, "users", auth.currentUser.uid, "notifications", id);
-    await updateDoc(notifRef, { read: true });
+    try {
+        const notifRef = doc(db, "users", auth.currentUser.uid, "notifications", id);
+        await updateDoc(notifRef, { read: true });
+    } catch (e) {
+        console.error(e);
+    }
   };
 
   const deleteNotif = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     if (!auth.currentUser) return;
-    await deleteDoc(doc(db, "users", auth.currentUser.uid, "notifications", id));
+    try {
+        await deleteDoc(doc(db, "users", auth.currentUser.uid, "notifications", id));
+    } catch (e) {
+        console.error(e);
+    }
   };
 
   const getIcon = (type: string) => {
@@ -76,7 +94,6 @@ export function NotificationDropdown() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Iconița de clopoțel */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-all relative"
@@ -87,7 +104,6 @@ export function NotificationDropdown() {
         )}
       </button>
 
-      {/* Meniul Dropdown */}
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">

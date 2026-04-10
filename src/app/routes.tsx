@@ -20,6 +20,7 @@ import { ManageMembers } from "./pages/ManageMembers";
 import { SavedAttractions } from "./pages/SavedAttractions";
 import { TripSettings } from "./pages/TripSettings";
 import { VoteNotifications } from "./pages/VoteNotifications";
+import { TripChat } from "./pages/TripChat";
 
 import { Root } from "./Root";
 
@@ -48,7 +49,8 @@ export const router = createBrowserRouter([
       { path: "manage-members/:id", Component: ManageMembers },
       { path: "saved-attractions", Component: SavedAttractions },
       { path: "trip-settings/:id", Component: TripSettings },
-      { path: "vote-notifications", Component: VoteNotifications }
+      { path: "vote-notifications", Component: VoteNotifications },
+      { path: "trip-chat/:id", Component: TripChat },
     ],
   },
 ]);

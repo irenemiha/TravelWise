@@ -16,11 +16,13 @@ export function Settings() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   
-  // --- STATE-URI SETĂRI ---
+  // LOGICA MODIFICATĂ: Inițializare precisă din localStorage sau preferințe sistem
   const [darkMode, setDarkMode] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) return savedTheme === "dark";
-    return document.documentElement.classList.contains("dark");
+    if (savedTheme) {
+      return savedTheme === "dark";
+    }
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
 
   const [notifications, setNotifications] = useState(true);
@@ -29,7 +31,6 @@ export function Settings() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // 1. AUTH & LOAD DATA: Ascultăm user-ul și încărcăm preferințele din Firestore
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
@@ -37,7 +38,6 @@ export function Settings() {
         return;
       }
       setUser(currentUser);
-
       try {
         const userRef = doc(db, "users", currentUser.uid);
         const snap = await getDoc(userRef);
@@ -52,11 +52,10 @@ export function Settings() {
         setLoading(false);
       }
     });
-
     return () => unsubAuth();
   }, [navigate]);
 
-  // 2. DARK MODE SYNC: Aplicăm clasa pe document și salvăm în localStorage
+  // LOGICA MODIFICATĂ: Persistență garantată și aplicare globală
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -67,14 +66,13 @@ export function Settings() {
     }
   }, [darkMode]);
 
-  // 3. FIREBASE UPDATES: Salvarea preferințelor în Firestore
   const updatePreference = async (key: string, value: boolean) => {
     if (!user) return;
     try {
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, { [key]: value });
     } catch (e) {
-      toast.error("Eroare la salvarea setărilor.");
+      toast.error("Eroare la salvare.");
     }
   };
 
@@ -90,57 +88,39 @@ export function Settings() {
     updatePreference("gpsEnabled", newValue);
   };
 
-  // 4. DELETE ACCOUNT: Ștergerea definitivă a utilizatorului
   const handleDeleteAccount = async () => {
     if (!user) return;
     setIsDeleting(true);
-    
     try {
       await deleteUser(user);
-      toast.success("Contul tău a fost șters definitiv.");
+      toast.success("Cont șters.");
       navigate("/login");
     } catch (error: any) {
-      if (error.code === 'auth/requires-recent-login') {
-        toast.error("Trebuie să te re-loghezi pentru a putea șterge contul.");
-      } else {
-        toast.error("Eroare la ștergerea contului.");
-      }
+      toast.error("Trebuie să te re-loghezi pentru a șterge contul.");
       setShowDeleteConfirm(false);
     } finally {
       setIsDeleting(false);
     }
   };
 
-  // --- SUB-COMPONENTE INTERNE ---
-
-  const SettingSection = ({ title, children }: { title: string, children: React.ReactNode }) => (
-    <div className="mb-10">
-      <h2 className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.3em] mb-4 ml-6">
-        {title}
-      </h2>
-      <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-        {children}
-      </div>
-    </div>
-  );
-
-  const SettingRow = ({ icon: Icon, title, desc, toggle, action, colorName = "blue" }: any) => {
-    // Mapare culori pentru a repara vizibilitatea iconițelor
-    const colorClasses: { [key: string]: { bg: string, text: string } } = {
-      blue: { bg: "bg-blue-600", text: "text-blue-600" },
-      purple: { bg: "bg-purple-600", text: "text-purple-600" },
-      green: { bg: "bg-green-600", text: "text-green-600" },
-      orange: { bg: "bg-orange-600", text: "text-orange-600" },
-      indigo: { bg: "bg-indigo-600", text: "text-indigo-600" },
+  const SettingRow = ({ icon: Icon, title, desc, toggle, action, colorVariant }: any) => {
+    const colorStyles: { [key: string]: string } = {
+      blue: "bg-blue-600 text-blue-600",
+      purple: "bg-purple-600 text-purple-600",
+      green: "bg-green-600 text-green-600",
+      orange: "bg-orange-600 text-orange-600",
+      indigo: "bg-indigo-600 text-indigo-600",
     };
 
-    const colors = colorClasses[colorName] || colorClasses.blue;
+    const style = colorStyles[colorVariant] || colorStyles.blue;
+    const bgColorClass = style.split(' ')[0];
+    const textColorClass = style.split(' ')[1];
 
     return (
       <div className="flex items-center justify-between p-6 border-b border-gray-50 dark:border-gray-800 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-all">
         <div className="flex items-center gap-5">
-          <div className={`p-3 rounded-2xl ${colors.bg} bg-opacity-20 flex items-center justify-center shadow-sm`}>
-            <Icon className={`w-5 h-5 ${colors.text} stroke-[2.5px]`} />
+          <div className={`p-3 rounded-2xl ${bgColorClass} bg-opacity-20 flex items-center justify-center shadow-sm`}>
+            <Icon className={`w-5 h-5 ${textColorClass} stroke-[2.5px]`} />
           </div>
           <div className="text-left">
             <p className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">{title}</p>
@@ -151,12 +131,12 @@ export function Settings() {
         {toggle !== undefined ? (
           <button 
             onClick={action}
-            className={`w-14 h-8 rounded-full transition-all relative flex items-center px-1 ${toggle ? 'bg-blue-600 shadow-lg shadow-blue-600/30' : 'bg-gray-200 dark:bg-gray-700'}`}
+            className={`w-14 h-8 rounded-full transition-all relative flex items-center px-1 ${toggle ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'}`}
           >
             <div className={`w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-300 ${toggle ? 'translate-x-6' : 'translate-x-0'}`} />
           </button>
         ) : (
-          <button onClick={action} className="p-2 text-gray-300 hover:text-blue-600 dark:hover:text-white transition-all">
+          <button onClick={action} className="p-2 text-gray-300 hover:text-blue-600 transition-all">
             <ChevronRight className="w-5 h-5" />
           </button>
         )}
@@ -164,113 +144,80 @@ export function Settings() {
     );
   };
 
-  if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
-        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+    </div>
+  );
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-950 transition-colors duration-300 min-h-screen pb-20 pt-12">
+    <div className="bg-gray-50 dark:bg-gray-950 transition-colors duration-300 min-h-screen pb-20 pt-12 font-sans">
       <div className="max-w-3xl mx-auto px-6">
         
-        {/* Header cu buton înapoi */}
         <div className="flex items-center gap-6 mb-12">
-          <button 
-            onClick={() => navigate(-1)} 
-            className="p-3 bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-100 dark:border-gray-800 hover:text-blue-600 transition-all active:scale-90"
-          >
-            <ArrowLeft className="w-6 h-6" />
+          <button onClick={() => navigate(-1)} className="p-3 bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-100 dark:border-gray-800">
+            <ArrowLeft className="w-6 h-6 text-gray-600 dark:text-gray-400" />
           </button>
           <div>
-            <h1 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">Setări Sistem</h1>
-            <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">Personalizează platforma TravelWise</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tighter">Setări Sistem</h1>
           </div>
         </div>
 
-        {/* SECȚIUNE: ASPECT */}
-        <SettingSection title="Aspect și Interfață">
-          <SettingRow 
-            icon={Bell} 
-            title="Notificări Mobile" 
-            desc="Alerte despre voturi și invitații noi."
-            toggle={notifications}
-            action={handleToggleNotifications}
-            colorName="blue"
-          />
-          <SettingRow 
-            icon={darkMode ? Sun : Moon} 
-            title="Mod Întunecat" 
-            desc="Comută între tema luminoasă și cea dark."
-            toggle={darkMode}
-            action={() => setDarkMode(!darkMode)}
-            colorName="purple"
-          />
-          <SettingRow 
-            icon={MapPin} 
-            title="Servicii Locație" 
-            desc="Permite accesul la GPS pentru hărți."
-            toggle={location}
-            action={handleToggleLocation}
-            colorName="green"
-          />
-        </SettingSection>
+        {/* ASPECT */}
+        <div className="mb-10">
+          <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4 ml-6">Aspect</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <SettingRow 
+              icon={Bell} title="Notificări" desc="Alerte voturi și invitații." 
+              toggle={notifications} action={handleToggleNotifications} colorVariant="blue" 
+            />
+            <SettingRow 
+              icon={darkMode ? Moon : Sun} title="Mod Întunecat" desc="Schimbă tema vizuală." 
+              toggle={darkMode} action={() => setDarkMode(!darkMode)} colorVariant="purple" 
+            />
+            <SettingRow 
+              icon={MapPin} title="Locație GPS" desc="Permite accesul la hărți." 
+              toggle={location} action={handleToggleLocation} colorVariant="green" 
+            />
+          </div>
+        </div>
 
-        {/* SECȚIUNE: CONT */}
-        <SettingSection title="Cont și Securitate">
-          <SettingRow 
-            icon={Globe} 
-            title="Limbă Aplicație" 
-            desc="Română (implicit)"
-            action={() => toast.info("Alte limbi vor fi disponibile curând!")}
-            colorName="orange"
-          />
-          <SettingRow 
-            icon={Lock} 
-            title="Schimbă Parola" 
-            desc="Protejează-ți accesul în cont."
-            action={() => toast.info("Accesează Reset Password din pagina de Login.")}
-            colorName="indigo"
-          />
-        </SettingSection>
+        {/* CONT */}
+        <div className="mb-10">
+          <h2 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mb-4 ml-6">Cont</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <SettingRow 
+              icon={Globe} title="Limbă" desc="Română (implicit)" 
+              action={() => toast.info("Disponibil curând")} colorVariant="orange" 
+            />
+            <SettingRow 
+              icon={Lock} title="Securitate" desc="Schimbă parola contului" 
+              action={() => navigate("/login")} colorVariant="indigo" 
+            />
+          </div>
+        </div>
 
-        {/* SECȚIUNE: DANGER ZONE */}
+        {/* DELETE */}
         <div className="mt-12 bg-red-50 dark:bg-red-900/10 rounded-[2.5rem] border border-red-100 dark:border-red-900/30 overflow-hidden">
-           <button 
-             onClick={() => setShowDeleteConfirm(true)}
-             className="w-full flex items-center justify-between p-8 hover:bg-red-100/50 dark:hover:bg-red-900/20 transition-all group"
-           >
+           <button onClick={() => setShowDeleteConfirm(true)} className="w-full flex items-center justify-between p-8 hover:bg-red-100/50 transition-all group">
              <div className="flex items-center gap-5">
-                <div className="p-3 bg-red-600 text-white rounded-2xl shadow-lg shadow-red-600/20 group-hover:scale-110 transition-transform">
+                <div className="p-3 bg-red-600 text-white rounded-2xl shadow-lg">
                   <Trash2 className="w-5 h-5" />
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-black text-red-600 uppercase tracking-tight">Șterge Contul Definitiv</p>
-                  <p className="text-xs text-red-500/70 font-bold">Această acțiune va șterge toate datele tale.</p>
+                  <p className="text-sm font-bold text-red-600">Șterge Contul</p>
+                  <p className="text-xs text-red-500/70 font-bold">Acțiune ireversibilă</p>
                 </div>
              </div>
              <ChevronRight className="w-5 h-5 text-red-300" />
            </button>
         </div>
-
-        <div className="text-center mt-12 mb-10">
-          <p className="text-[10px] font-black text-gray-300 dark:text-gray-700 uppercase tracking-[0.5em]">
-            TravelWise Web Edition v1.0.4
-          </p>
-        </div>
       </div>
 
-      {/* MODAL CONFIRMARE ȘTERGERE */}
       <ConfirmDialog
-        isOpen={showDeleteConfirm}
-        title="Ștergere Cont"
-        message="Atenție! Vei pierde toate călătoriile, mesajele și locațiile salvate. Ești absolut sigur că vrei să continui?"
-        confirmText={isDeleting ? "Se șterge..." : "Șterge definitiv"}
-        cancelText="Anulează"
-        onConfirm={handleDeleteAccount}
-        onCancel={() => !isDeleting && setShowDeleteConfirm(false)}
+        isOpen={showDeleteConfirm} title="Ștergere Cont" message="Ești sigur că vrei să ștergi totul definitiv?"
+        confirmText={isDeleting ? "Se șterge..." : "Șterge"} cancelText="Anulează"
+        onConfirm={handleDeleteAccount} onCancel={() => !isDeleting && setShowDeleteConfirm(false)}
       />
     </div>
   );

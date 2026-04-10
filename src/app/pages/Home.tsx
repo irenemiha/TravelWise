@@ -48,7 +48,7 @@ export function Home() {
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                to="/dashboard"
+                to="/new-trip"
                 className="inline-flex items-center justify-center px-8 py-4 text-base font-bold rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-600/30 transition-all gap-2"
               >
                 Începe gratuit
@@ -255,7 +255,7 @@ export function Home() {
             TravelWise fără stres.
           </p>
           <Link
-            to="/dashboard"
+            to="/new-trip"
             className="inline-block font-black bg-white text-blue-700 px-10 py-5 rounded-2xl hover:bg-blue-50 transition-all active:scale-95 shadow-2xl uppercase tracking-widest text-xs"
           >
             Creează prima ta călătorie

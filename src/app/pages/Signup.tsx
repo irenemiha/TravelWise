@@ -42,9 +42,9 @@ export function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-6">
+    <div className="min-h-[calc(100vh-64px)] bg-gradient-to-r from-blue-950 via-purple-900 to-fuchsia-950 flex items-center justify-center p-6">
       <div className="max-w-md w-full bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-2xl p-10 border dark:border-gray-800">
-        <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">Cont Nou</h2>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">Cont Nou</h2>
         <p className="text-gray-500 mb-8 font-medium">Alătură-te comunității TravelWise</p>
 
         <form onSubmit={handleSignup} className="space-y-4">

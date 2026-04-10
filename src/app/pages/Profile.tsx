@@ -128,7 +128,7 @@ export function Profile() {
         
         {/* Profile Header Card */}
         <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden mb-8">
-          <div className="h-40 bg-gradient-to-r from-blue-600 via-purple-600 to-fuchsia-600"></div>
+          <div className="h-40 bg-gradient-to-r from-blue-950 via-purple-900 to-fuchsia-950"></div>
           <div className="px-8 pb-8">
             <div className="relative flex justify-between items-end -mt-16 mb-6">
               <div className="relative">
