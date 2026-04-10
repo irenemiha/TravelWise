@@ -3,9 +3,11 @@ import { Navigation } from "./components/Navigation";
 
 export function Root() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       <Navigation />
-      <Outlet />
+      <main>
+        <Outlet /> {/* AICI se vor randa Home, Profile, Dashboard etc. */}
+      </main>
     </div>
   );
 }

@@ -12,7 +12,7 @@ import { ImageWithFallback } from "../components/figma/ImageWithFallback";
 
 export function Home() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors duration-300">
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
         {/* Full background image */}
@@ -23,7 +23,7 @@ export function Home() {
             className="w-full h-full object-cover object-center"
           />
           {/* Gradient overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/80 via-gray-900/50 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/60 to-gray-900/30 dark:from-black/90 dark:via-black/60 dark:to-transparent"></div>
           <div className="absolute inset-0 bg-black/20"></div>
         </div>
 
@@ -31,7 +31,7 @@ export function Home() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-white/90 text-sm font-medium mb-6">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-              Platforma ta de planificare colabrativă
+              Platforma ta de planificare colaborativă
             </div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white tracking-tight mb-6 drop-shadow-lg">
@@ -76,45 +76,45 @@ export function Home() {
       </section>
 
       {/* Problem Section */}
-      <section className="py-16 sm:py-24 bg-white">
+      <section className="py-16 sm:py-24 bg-white dark:bg-gray-950 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl mb-4 text-gray-900">
+            <h2 className="text-3xl sm:text-4xl mb-4 text-gray-900 dark:text-white font-bold">
               Îți sună cunoscut?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Planificarea unei vacanțe în grup poate fi complicată și
-              frustrантă
+              frustrantă.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-red-50 p-6 rounded-xl">
-              <div className="text-red-600 mb-4">❌</div>
-              <h3 className="text-xl mb-2 text-gray-900">
+            <div className="bg-red-50 dark:bg-red-900/10 p-8 rounded-2xl border border-red-100/50 dark:border-red-900/20">
+              <div className="text-red-600 dark:text-red-400 text-2xl mb-4">❌</div>
+              <h3 className="text-xl mb-2 text-gray-900 dark:text-white font-bold">
                 Prea multe mesaje
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Discuții nesfârșite pe WhatsApp sau Messenger pentru a decide
-                ce să vizitați
+                ce să vizitați.
               </p>
             </div>
-            <div className="bg-red-50 p-6 rounded-xl">
-              <div className="text-red-600 mb-4">❌</div>
-              <h3 className="text-xl mb-2 text-gray-900">
+            <div className="bg-red-50 dark:bg-red-900/10 p-8 rounded-2xl border border-red-100/50 dark:border-red-900/20">
+              <div className="text-red-600 dark:text-red-400 text-2xl mb-4">❌</div>
+              <h3 className="text-xl mb-2 text-gray-900 dark:text-white font-bold">
                 Preferințe diferite
               </h3>
-              <p className="text-gray-600">
-                Fiecare are idei diferite și e greu să găsiți un compromis
+              <p className="text-gray-600 dark:text-gray-400">
+                Fiecare are idei diferite și e greu să găsiți un compromis acceptabil.
               </p>
             </div>
-            <div className="bg-red-50 p-6 rounded-xl">
-              <div className="text-red-600 mb-4">❌</div>
-              <h3 className="text-xl mb-2 text-gray-900">
+            <div className="bg-red-50 dark:bg-red-900/10 p-8 rounded-2xl border border-red-100/50 dark:border-red-900/20">
+              <div className="text-red-600 dark:text-red-400 text-2xl mb-4">❌</div>
+              <h3 className="text-xl mb-2 text-gray-900 dark:text-white font-bold">
                 Informații împrăștiate
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Folosiți 5+ aplicații diferite pentru a planifica o singură
-                călătorie
+                călătorie.
               </p>
             </div>
           </div>
@@ -122,67 +122,67 @@ export function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-16 sm:py-24 bg-gray-50">
+      <section id="features" className="py-16 sm:py-24 bg-gray-50 dark:bg-gray-900/50 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl mb-4 text-gray-900">
+            <h2 className="text-3xl sm:text-4xl mb-4 text-gray-900 dark:text-white font-bold">
               Cum funcționează TravelWise
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Un proces simplu în 4 pași pentru călătoria perfectă
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+              Un proces simplu în 4 pași pentru călătoria perfectă.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-blue-600" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 items-center">
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 transition-all">
+              <div className="bg-blue-100 dark:bg-blue-900/30 w-12 h-12 rounded-xl flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
-              <div className="text-sm text-blue-600 mb-2">PASUL 1</div>
-              <h3 className="text-xl mb-2 text-gray-900">
+              <div className="text-sm text-blue-600 dark:text-blue-400 font-bold mb-2">PASUL 1</div>
+              <h3 className="text-xl mb-2 text-gray-900 dark:text-white font-bold">
                 Creează grupul
               </h3>
-              <p className="text-gray-600">
-                Invită prietenii în grupul tău de călătorie
+              <p className="text-gray-600 dark:text-gray-400">
+                Invită prietenii în grupul tău de călătorie folosind un link simplu.
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="bg-purple-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <MapPin className="w-6 h-6 text-purple-600" />
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 transition-all">
+              <div className="bg-purple-100 dark:bg-purple-900/30 w-12 h-12 rounded-xl flex items-center justify-center mb-4">
+                <MapPin className="w-6 h-6 text-purple-600 dark:text-purple-400" />
               </div>
-              <div className="text-sm text-purple-600 mb-2">PASUL 2</div>
-              <h3 className="text-xl mb-2 text-gray-900">
+              <div className="text-sm text-purple-600 dark:text-purple-400 font-bold mb-2">PASUL 2</div>
+              <h3 className="text-xl mb-2 text-gray-900 dark:text-white font-bold">
                 Explorează atracțiile
               </h3>
-              <p className="text-gray-600">
-                Descoperă obiective turistice și activități
+              <p className="text-gray-600 dark:text-gray-400">
+                Descoperă obiective turistice și activități sugerate special pentru voi.
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <Vote className="w-6 h-6 text-green-600" />
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 transition-all">
+              <div className="bg-green-100 dark:bg-green-900/30 w-12 h-12 rounded-xl flex items-center justify-center mb-4">
+                <Vote className="w-6 h-6 text-green-600 dark:text-green-400" />
               </div>
-              <div className="text-sm text-green-600 mb-2">PASUL 3</div>
-              <h3 className="text-xl mb-2 text-gray-900">
+              <div className="text-sm text-green-600 dark:text-green-400 font-bold mb-2">PASUL 3</div>
+              <h3 className="text-xl mb-2 text-gray-900 dark:text-white font-bold">
                 Votează împreună
               </h3>
-              <p className="text-gray-600">
-                Toți membrii votează atracțiile preferate
+              <p className="text-gray-600 dark:text-gray-400">
+                Toți membrii votează atracțiile preferate pentru a vedea ce dorește majoritatea.
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="bg-orange-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <Calendar className="w-6 h-6 text-orange-600" />
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 transition-all">
+              <div className="bg-orange-100 dark:bg-orange-900/30 w-12 h-12 rounded-xl flex items-center justify-center mb-4">
+                <Calendar className="w-6 h-6 text-orange-600 dark:text-orange-400" />
               </div>
-              <div className="text-sm text-orange-600 mb-2">PASUL 4</div>
-              <h3 className="text-xl mb-2 text-gray-900">
+              <div className="text-sm text-orange-600 dark:text-orange-400 font-bold mb-2">PASUL 4</div>
+              <h3 className="text-xl mb-2 text-gray-900 dark:text-white font-bold">
                 Generează itinerarul
               </h3>
-              <p className="text-gray-600">
-                Sistemul creează automat itinerarul perfect
+              <p className="text-gray-600 dark:text-gray-400">
+                Sistemul creează automat itinerarul perfect bazat pe preferințele voastre.
               </p>
             </div>
           </div>
@@ -190,61 +190,50 @@ export function Home() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 sm:py-24 bg-white">
+      <section className="py-16 sm:py-24 bg-white dark:bg-gray-950 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl sm:text-4xl mb-6 text-gray-900">
+              <h2 className="text-3xl sm:text-4xl mb-6 text-gray-900 dark:text-white font-bold">
                 De ce să alegi TravelWise?
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="flex gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                  <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-500 flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-xl mb-1 text-gray-900">
+                    <h3 className="text-xl mb-1 text-gray-900 dark:text-white font-bold">
                       Economisește timp
                     </h3>
-                    <p className="text-gray-600">
-                      Reduce timpul de planificare cu până la 70%
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Reduce timpul de planificare cu până la 70%. Uită de tabele Excel complicate.
                     </p>
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                  <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-500 flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-xl mb-1 text-gray-900">
+                    <h3 className="text-xl mb-1 text-gray-900 dark:text-white font-bold">
                       Decizii democratice
                     </h3>
-                    <p className="text-gray-600">
-                      Fiecare are voce în planificarea călătoriei
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Fiecare are voce în planificarea călătoriei. Gata cu „mergem unde vrea șeful grupului”.
                     </p>
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+                  <CheckCircle className="w-6 h-6 text-green-600 dark:text-green-500 flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-xl mb-1 text-gray-900">
+                    <h3 className="text-xl mb-1 text-gray-900 dark:text-white font-bold">
                       Tot într-un loc
                     </h3>
-                    <p className="text-gray-600">
-                      Nu mai trebuie să jonglezi între 10 aplicații diferite
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="text-xl mb-1 text-gray-900">
-                      Experiență colaborativă
-                    </h3>
-                    <p className="text-gray-600">
-                      Toată lumea participă activ la planificare
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Chat, atracții, voturi și itinerariu - toate integrate perfect într-o singură aplicație.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="rounded-2xl overflow-hidden shadow-2xl">
+            <div className="rounded-[2.5rem] overflow-hidden shadow-2xl border border-gray-100 dark:border-gray-800">
               <ImageWithFallback
                 src="https://images.unsplash.com/photo-1761653457994-f216b01302bd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxncm91cCUyMHBlb3BsZSUyMHBsYW5uaW5nJTIwdHJpcHxlbnwxfHx8fDE3NzQyNzI0Nzh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
                 alt="Group planning"
@@ -256,18 +245,18 @@ export function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-24 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <section className="py-16 sm:py-24 bg-gradient-to-r from-blue-950 via-purple-900 to-fuchsia-950 text-white shadow-inner">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl mb-6">
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-6">
             Gata să planifici următoarea aventură?
           </h2>
-          <p className="text-xl mb-8 text-blue-100">
+          <p className="text-xl mb-10 text-blue-100">
             Alătură-te miilor de grupuri care își planifică călătoriile cu
-            TravelWise
+            TravelWise fără stres.
           </p>
           <Link
             to="/dashboard"
-            className="inline-block font-bold bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-blue-50 transition-colors"
+            className="inline-block font-black bg-white text-blue-700 px-10 py-5 rounded-2xl hover:bg-blue-50 transition-all active:scale-95 shadow-2xl uppercase tracking-widest text-xs"
           >
             Creează prima ta călătorie
           </Link>
@@ -275,47 +264,47 @@ export function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12">
+      <footer className="bg-gray-950 text-gray-400 py-16 border-t border-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 mb-6">
                 <div className="bg-blue-600 p-2 rounded-lg">
                   <Plane className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-white">TravelWise</span>
+                <span className="text-white font-bold text-xl tracking-tight">TravelWise</span>
               </div>
-              <p className="text-sm">
-                Planificarea călătoriilor în grup, simplificată.
+              <p className="text-sm leading-relaxed">
+                Planificarea călătoriilor în grup, simplificată prin tehnologie și colaborare reală.
               </p>
             </div>
             <div>
-              <h4 className="text-white mb-4">Produs</h4>
-              <div className="space-y-2 text-sm">
-                <div>Funcționalități</div>
-                <div>Prețuri</div>
-                <div>Demo</div>
-              </div>
+              <h4 className="text-white font-bold mb-6">Produs</h4>
+              <ul className="space-y-4 text-sm">
+                <li className="hover:text-blue-400 transition-colors cursor-pointer">Funcționalități</li>
+                <li className="hover:text-blue-400 transition-colors cursor-pointer">Prețuri</li>
+                <li className="hover:text-blue-400 transition-colors cursor-pointer">Demo</li>
+              </ul>
             </div>
             <div>
-              <h4 className="text-white mb-4">Companie</h4>
-              <div className="space-y-2 text-sm">
-                <div>Despre noi</div>
-                <div>Echipa</div>
-                <div>Contact</div>
-              </div>
+              <h4 className="text-white font-bold mb-6">Companie</h4>
+              <ul className="space-y-4 text-sm">
+                <li className="hover:text-blue-400 transition-colors cursor-pointer">Despre noi</li>
+                <li className="hover:text-blue-400 transition-colors cursor-pointer">Echipa</li>
+                <li className="hover:text-blue-400 transition-colors cursor-pointer">Contact</li>
+              </ul>
             </div>
             <div>
-              <h4 className="text-white mb-4">Legal</h4>
-              <div className="space-y-2 text-sm">
-                <div>Termeni</div>
-                <div>Confidențialitate</div>
-                <div>Cookie-uri</div>
-              </div>
+              <h4 className="text-white font-bold mb-6">Legal</h4>
+              <ul className="space-y-4 text-sm">
+                <li className="hover:text-blue-400 transition-colors cursor-pointer">Termeni</li>
+                <li className="hover:text-blue-400 transition-colors cursor-pointer">Confidențialitate</li>
+                <li className="hover:text-blue-400 transition-colors cursor-pointer">Cookie-uri</li>
+              </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
-            © 2026 TravelWise. Toate drepturile rezervate.
+          <div className="border-t border-gray-900 mt-12 pt-8 text-center text-xs font-medium uppercase tracking-widest">
+            © 2026 TravelWise. Creat cu ❤️ pentru călători.
           </div>
         </div>
       </footer>

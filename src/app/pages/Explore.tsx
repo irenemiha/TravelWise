@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router";
+import { useParams, Link, useNavigate } from "react-router";
 import {
   MapPin,
   Clock,
@@ -7,220 +7,253 @@ import {
   ThumbsUp,
   ThumbsDown,
   Search,
-  Filter,
   Heart,
-  Info,
+  Loader2,
 } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
-interface Attraction {
+// IMPORTURI FIREBASE
+import { db, auth } from "../../firebase";
+import { 
+  collection, 
+  doc, 
+  onSnapshot, 
+  updateDoc, 
+  arrayUnion, 
+  arrayRemove, 
+  setDoc,
+} from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+
+export interface Attraction {
   id: string;
   name: string;
   description: string;
   image: string;
   rating: number;
-  reviews: number;
+  votes: { up: number; down: number };
+  category: string;
+  location: string;
   duration: string;
   price: string;
-  category: string;
-  votes: { up: number; down: number };
-  userVote: "up" | "down" | null;
   saved: boolean;
+  userVote: "up" | "down" | null;
 }
-
-const mockAttractions: Attraction[] = [
-  {
-    id: "1",
-    name: "Turnul Eiffel",
-    description:
-      "Simbolul iconic al Parisului, oferă vederi spectaculoase asupra orașului",
-    image:
-      "https://images.unsplash.com/photo-1642947392578-b37fbd9a4d45?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlaWZmZWwlMjB0b3dlciUyMHBhcmlzJTIwZnJhbmNlfGVufDF8fHx8MTc3NDE5MDc4NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    rating: 4.8,
-    reviews: 25420,
-    duration: "2-3 ore",
-    price: "€26",
-    category: "Monumente",
-    votes: { up: 5, down: 1 },
-    userVote: "up",
-    saved: true,
-  },
-  {
-    id: "2",
-    name: "Muzeul Luvru",
-    description:
-      "Cel mai mare muzeu de artă din lume, cu colecții de neprețuit",
-    image:
-      "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsb3V2cmUlMjBtdXNldW18ZW58MXx8fHwxNzc0MjcyNDc4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    rating: 4.7,
-    reviews: 18950,
-    duration: "3-4 ore",
-    price: "€17",
-    category: "Muzee",
-    votes: { up: 4, down: 0 },
-    userVote: "up",
-    saved: true,
-  },
-  {
-    id: "3",
-    name: "Arc de Triomphe",
-    description: "Monument istoric dedicat armatelor franceze",
-    image:
-      "https://images.unsplash.com/photo-1549144511-f099e773c147?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcmMlMjBkZSUyMHRyaW9tcGhlfGVufDF8fHx8MTc3NDI3MjQ3OHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    rating: 4.6,
-    reviews: 12300,
-    duration: "1-2 ore",
-    price: "€13",
-    category: "Monumente",
-    votes: { up: 3, down: 1 },
-    userVote: null,
-    saved: false,
-  },
-  {
-    id: "4",
-    name: "Catedrala Notre-Dame",
-    description: "Capodoperă gotică în inima Parisului",
-    image:
-      "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxub3RyZSUyMGRhbWUlMjBwYXJpc3xlbnwxfHx8fDE3NzQyNzI0Nzh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    rating: 4.7,
-    reviews: 15600,
-    duration: "1-2 ore",
-    price: "Gratuit",
-    category: "Monumente",
-    votes: { up: 4, down: 0 },
-    userVote: null,
-    saved: false,
-  },
-  {
-    id: "5",
-    name: "Sacré-Cœur",
-    description: "Bazilică albă impresionantă pe dealul Montmartre",
-    image:
-      "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxzYWNyZSUyMGNvZXVyfGVufDF8fHx8MTc3NDI3MjQ3OHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    rating: 4.7,
-    reviews: 9800,
-    duration: "1-2 ore",
-    price: "Gratuit",
-    category: "Religios",
-    votes: { up: 2, down: 0 },
-    userVote: null,
-    saved: false,
-  },
-  {
-    id: "6",
-    name: "Grădinile Versailles",
-    description: "Grădini regale magnifice cu fântâni și sculpturi",
-    image:
-      "https://images.unsplash.com/photo-1580655653885-65763b2597d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx2ZXJzYWlsbGVzJTIwZ2FyZGVuc3xlbnwxfHx8fDE3NzQyNzI0Nzh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    rating: 4.9,
-    reviews: 8500,
-    duration: "3-5 ore",
-    price: "€20",
-    category: "Parcuri",
-    votes: { up: 3, down: 1 },
-    userVote: null,
-    saved: false,
-  },
-];
 
 export function Explore() {
   const { id } = useParams();
-  const [attractions, setAttractions] = useState(mockAttractions);
+  const tripId = id || "";
+  const navigate = useNavigate();
+
+  const [trip, setTrip] = useState<any>(null);
+  const [attractions, setAttractions] = useState<Attraction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  
+  const [userSavedIds, setUserSavedIds] = useState<string[]>([]);
+  const [votesData, setVotesData] = useState<{[key: string]: any}>({});
 
-  const handleVote = (attractionId: string, voteType: "up" | "down") => {
-    setAttractions((prev) =>
-      prev.map((attr) => {
-        if (attr.id === attractionId) {
-          const newVotes = { ...attr.votes };
-          const oldVote = attr.userVote;
+  // 1. GESTIONARE AUTH ȘI DATE TRIP (Rezolvă bug-ul de redirect)
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        navigate("/");
+        return;
+      }
+      setAuthLoading(false);
 
-          // Remove old vote if exists
-          if (oldVote === "up") newVotes.up--;
-          if (oldVote === "down") newVotes.down--;
-
-          // Add new vote if different from old
-          const newVote = oldVote === voteType ? null : voteType;
-          if (newVote === "up") newVotes.up++;
-          if (newVote === "down") newVotes.down++;
-
-          return { ...attr, votes: newVotes, userVote: newVote };
+      // Ascultăm datele Trip-ului
+      const tripRef = doc(db, "trips", tripId);
+      const unsubTrip = onSnapshot(tripRef, (snap) => {
+        if (snap.exists()) {
+          setTrip({ id: snap.id, ...snap.data() });
+        } else {
+          toast.error("Călătoria nu a fost găsită");
+          navigate("/dashboard");
         }
-        return attr;
-      })
-    );
+      });
+
+      // Ascultăm favoritele userului
+      const userRef = doc(db, "users", user.uid);
+      const unsubUser = onSnapshot(userRef, (snap) => {
+        if (snap.exists()) {
+          setUserSavedIds(snap.data().savedAttractions || []);
+        }
+      });
+
+      return () => { unsubTrip(); unsubUser(); };
+    });
+
+    return () => unsubscribeAuth();
+  }, [tripId, navigate]);
+
+  // 2. ASCULTĂ VOTURILE REALE (Subcolecția din Firebase)
+  useEffect(() => {
+    if (!tripId || authLoading) return;
+    const votesRef = collection(db, "trips", tripId, "attractionVotes");
+    const unsubVotes = onSnapshot(votesRef, (snapshot) => {
+      const votesMap: any = {};
+      snapshot.docs.forEach(doc => { votesMap[doc.id] = doc.data(); });
+      setVotesData(votesMap);
+    });
+    return () => unsubVotes();
+  }, [tripId, authLoading]);
+
+  // 3. FETCH LOCAȚII REALE (GEOAPIFY)
+  useEffect(() => {
+    if (!trip?.destination) return;
+    const cityName = trip.destination.split(",")[0].trim();
+    const cacheKey = `explore_cache_${cityName}`;
+
+    const fetchPlaces = async () => {
+      const savedCache = localStorage.getItem(cacheKey);
+      if (savedCache) {
+        setAttractions(JSON.parse(savedCache));
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}&limit=1`);
+        const geoData = await geoRes.json();
+        if (!geoData || geoData.length === 0) return;
+        const { lat, lon } = geoData[0];
+        
+        const API_KEY = "6627c045fcd14d76b5b547c8f3c54d17";
+        const response = await fetch(
+          `https://api.geoapify.com/v2/places?categories=tourism.attraction,catering.restaurant,entertainment.museum&filter=circle:${lon},${lat},5000&limit=30&lang=ro&apiKey=${API_KEY}`
+        );
+        const data = await response.json();
+        
+        const mappedData: Attraction[] = data.features.map((f: any) => {
+          const p = f.properties;
+          const cleanName = (p.name || "Locație").split(/[($]/)[0].trim();
+          const category = p.categories.includes("catering.restaurant") ? "Restaurante" : p.categories.includes("entertainment.museum") ? "Muzee" : "Atracții";
+          
+          return {
+            id: p.place_id,
+            name: cleanName,
+            description: `O destinație populară în ${cityName}, perfectă pentru grupul tău.`,
+            image: `https://tse1.mm.bing.net/th?q=${encodeURIComponent(cleanName + " " + cityName)}&w=800&h=450&c=1&p=0`, 
+            rating: parseFloat((4.0 + (Math.random() * 0.9)).toFixed(1)),
+            votes: { up: 0, down: 0 },
+            category: category,
+            location: cityName,
+            duration: category === "Restaurante" ? "1-2 ore" : "2-3 ore",
+            price: category === "Muzee" ? "15-25 €" : "20-50 €",
+            saved: false,
+            userVote: null
+          };
+        });
+
+        localStorage.setItem(cacheKey, JSON.stringify(mappedData));
+        setAttractions(mappedData);
+      } catch (e) {
+        console.error("Fetch error", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPlaces();
+  }, [trip?.destination]);
+
+  // 4. HANDLERS (PERSISTENȚĂ FIREBASE)
+  const handleVote = async (attractionId: string, type: "up" | "down") => {
+    if (!auth.currentUser || !tripId) return;
+    const userId = auth.currentUser.uid;
+    const voteDocRef = doc(db, "trips", tripId, "attractionVotes", attractionId);
+    
+    const currentData = votesData[attractionId] || { up: 0, down: 0, voters: {} };
+    const previousVote = currentData.voters?.[userId] || null;
+    
+    let newUp = currentData.up || 0;
+    let newDown = currentData.down || 0;
+    let newVoters = { ...(currentData.voters || {}) };
+
+    if (previousVote === type) {
+      type === "up" ? newUp-- : newDown--;
+      delete newVoters[userId];
+    } else {
+      if (previousVote === "up") newUp--;
+      if (previousVote === "down") newDown--;
+      type === "up" ? newUp++ : newDown++;
+      newVoters[userId] = type;
+    }
+
+    await setDoc(voteDocRef, { up: Math.max(0, newUp), down: Math.max(0, newDown), voters: newVoters });
   };
 
-  const toggleSave = (attractionId: string) => {
-    setAttractions((prev) =>
-      prev.map((attr) =>
-        attr.id === attractionId ? { ...attr, saved: !attr.saved } : attr
-      )
-    );
+  const toggleSave = async (id: string) => {
+    if (!auth.currentUser) return;
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    const isCurrentlySaved = userSavedIds.includes(id);
+
+    try {
+      if (isCurrentlySaved) {
+        await updateDoc(userRef, { savedAttractions: arrayRemove(id) });
+        toast.info("Eliminat din favorite");
+      } else {
+        await updateDoc(userRef, { savedAttractions: arrayUnion(id) });
+        toast.success("Salvat!");
+      }
+    } catch (e) { toast.error("Eroare Firebase"); }
   };
 
-  const categories = [
-    "all",
-    ...Array.from(new Set(mockAttractions.map((a) => a.category))),
-  ];
+  const categories = ["all", "Restaurante", "Muzee", "Atracții"];
 
   const filteredAttractions = attractions.filter((attr) => {
-    const matchesSearch =
-      attr.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      attr.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "all" || attr.category === selectedCategory;
+    const matchesSearch = attr.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === "all" || attr.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
+  if (authLoading) return <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950"><Loader2 className="animate-spin text-blue-600" /></div>;
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
-      {/* Header */}
-      <div className="bg-white border-b sticky top-16 z-40">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300 pb-8">
+      {/* Header Sticky */}
+      <div className="bg-white dark:bg-gray-900 border-b dark:border-gray-800 sticky top-16 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-3xl mb-1 text-gray-900">
-                Explorează Paris
+              <h1 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+                Explorează {trip?.destination?.split(',')[0]}
               </h1>
-              <p className="text-gray-600">
-                Descoperă și votează atracțiile preferate
-              </p>
+              <p className="text-gray-500 dark:text-gray-400 font-medium">Sincronizat live cu grupul tău</p>
             </div>
-            <Link
-              to={`/trip/${id}`}
-              className="text-blue-600 hover:text-blue-700 font-bold"
-            >
-              ← Înapoi la călătorie
+            <Link to={`/trip/${tripId}`} className="text-blue-600 dark:text-blue-400 font-black text-xs uppercase tracking-widest border-b-2 border-blue-600">
+              ← Înapoi
             </Link>
           </div>
 
-          {/* Search and Filter */}
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Caută atracții..."
+                placeholder="Caută în locații..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-gray-800 border-none rounded-2xl focus:ring-2 focus:ring-blue-600 dark:text-white font-bold transition-all"
               />
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
-              {categories.map((category) => (
+            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+              {categories.map((cat) => (
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`font-bold px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                    selectedCategory === category
-                      ? "bg-blue-600 text-white"
-                      : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`font-black px-6 py-4 rounded-2xl whitespace-nowrap transition-all text-xs uppercase tracking-widest ${
+                    selectedCategory === cat
+                      ? "bg-blue-600 text-white shadow-xl shadow-blue-500/20"
+                      : "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400"
                   }`}
                 >
-                  {category === "all" ? "Toate" : category}
+                  {cat === "all" ? "Toate" : cat}
                 </button>
               ))}
             </div>
@@ -229,135 +262,75 @@ export function Explore() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        {/* Stats Bar */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-6">
-              <div>
-                <div className="text-2xl text-blue-600">
-                  {attractions.filter((a) => a.saved).length}
-                </div>
-                <div className="text-sm text-gray-600">Atracții salvate</div>
-              </div>
-              <div>
-                <div className="text-2xl text-blue-600">
-                  {attractions.reduce((acc, a) => acc + a.votes.up, 0)}
-                </div>
-                <div className="text-sm text-gray-600">Voturi totale</div>
-              </div>
+        {/* Statistics Bar */}
+        <div className="bg-white dark:bg-gray-900 rounded-3xl p-6 mb-8 border border-gray-100 dark:border-gray-800 flex items-center justify-between shadow-sm">
+          <div className="flex gap-10">
+            <div>
+              <div className="text-2xl font-black text-blue-600">{userSavedIds.length}</div>
+              <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Salvate</div>
             </div>
-            <div className="text-sm text-gray-600">
-              {filteredAttractions.length} rezultate
+            <div>
+              <div className="text-2xl font-black text-purple-600">{attractions.length}</div>
+              <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Disponibile</div>
             </div>
+          </div>
+          <div className="text-[10px] font-black uppercase text-gray-400 tracking-widest bg-gray-50 dark:bg-gray-800 px-4 py-2 rounded-xl">
+            {filteredAttractions.length} rezultate
           </div>
         </div>
 
         {/* Attractions Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredAttractions.map((attraction) => (
-            <div
-              key={attraction.id}
-              className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow"
-            >
-              <div className="relative h-48">
-                <ImageWithFallback
-                  src={attraction.image}
-                  alt={attraction.name}
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  onClick={() => toggleSave(attraction.id)}
-                  className="absolute top-4 right-4 w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-lg"
-                >
-                  <Heart
-                    className={`w-5 h-5 ${
-                      attraction.saved
-                        ? "fill-red-500 text-red-500"
-                        : "text-gray-600"
-                    }`}
-                  />
-                </button>
-                <div className="absolute top-4 left-4 bg-white bg-opacity-90 backdrop-blur-sm px-3 py-1 rounded-full text-sm">
-                  {attraction.category}
-                </div>
-              </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {isLoading ? (
+            <div className="col-span-full py-20 flex flex-col items-center gap-4">
+              <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+              <p className="font-black uppercase text-[10px] tracking-[0.3em] text-gray-400">Încărcăm destinații...</p>
+            </div>
+          ) : filteredAttractions.map((attraction) => {
+            const persistentVote = votesData[attraction.id] || { up: 0, down: 0, voters: {} };
+            const userVote = persistentVote.voters?.[auth.currentUser?.uid || ""] || null;
+            const isSaved = userSavedIds.includes(attraction.id);
 
-              <div className="p-5">
-                <h3 className="text-xl mb-2 text-gray-900">
-                  {attraction.name}
-                </h3>
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                  {attraction.description}
-                </p>
-
-                {/* Rating and Details */}
-                <div className="flex flex-wrap gap-3 mb-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span>
-                      {attraction.rating} ({attraction.reviews.toLocaleString()}
-                      )
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{attraction.duration}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <DollarSign className="w-4 h-4" />
-                    <span>{attraction.price}</span>
+            return (
+              <div key={attraction.id} className="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-sm overflow-hidden border border-gray-100 dark:border-gray-800 group hover:shadow-2xl transition-all duration-500">
+                <div className="relative h-60 flex">
+                  <ImageWithFallback src={attraction.image} alt={attraction.name} className="w-full h-full min-w-full min-h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <button onClick={() => toggleSave(attraction.id)} className="absolute top-5 right-5 w-12 h-12 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md rounded-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-xl">
+                    <Heart className={`w-6 h-6 ${isSaved ? "fill-red-500 text-red-500" : "text-gray-300"}`} />
+                  </button>
+                  <div className="absolute top-5 left-5 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl shadow-lg">
+                    {attraction.category}
                   </div>
                 </div>
 
-                {/* Voting Section */}
-                <div className="border-t pt-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleVote(attraction.id, "up")}
-                        className={`font-bold flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors ${
-                          attraction.userVote === "up"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-600 hover:bg-green-50"
-                        }`}
-                      >
-                        <ThumbsUp className="w-4 h-4" />
-                        <span>{attraction.votes.up}</span>
+                <div className="p-8">
+                  <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">{attraction.name}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 line-clamp-2 font-medium leading-relaxed">{attraction.description}</p>
+
+                  <div className="flex gap-6 mb-8 text-[11px] font-black uppercase tracking-widest text-gray-400">
+                    <div className="flex items-center gap-2"><Star className="w-4 h-4 fill-yellow-400 text-yellow-400" /> <span className="text-gray-900 dark:text-white">{attraction.rating}</span></div>
+                    <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-blue-500" /> {attraction.duration}</div>
+                    <div className="flex items-center gap-2"><DollarSign className="w-4 h-4 text-green-500" /> {attraction.price}</div>
+                  </div>
+
+                  <div className="border-t dark:border-gray-800 pt-6 flex items-center justify-between">
+                    <div className="flex gap-3">
+                      <button onClick={() => handleVote(attraction.id, "up")} className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-black text-xs transition-all ${userVote === "up" ? "bg-green-500 text-white shadow-lg shadow-green-500/30" : "bg-gray-100 dark:bg-gray-800 text-gray-500"}`}>
+                        <ThumbsUp className="w-4 h-4" /> {persistentVote.up || 0}
                       </button>
-                      <button
-                        onClick={() => handleVote(attraction.id, "down")}
-                        className={`font-bold flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors ${
-                          attraction.userVote === "down"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-gray-100 text-gray-600 hover:bg-red-50"
-                        }`}
-                      >
-                        <ThumbsDown className="w-4 h-4" />
-                        <span>{attraction.votes.down}</span>
+                      <button onClick={() => handleVote(attraction.id, "down")} className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-black text-xs transition-all ${userVote === "down" ? "bg-red-500 text-white shadow-lg shadow-red-500/30" : "bg-gray-100 dark:bg-gray-800 text-gray-500"}`}>
+                        <ThumbsDown className="w-4 h-4" /> {persistentVote.down || 0}
                       </button>
                     </div>
-                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                      <Info className="w-5 h-5 text-gray-600" />
-                    </button>
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(attraction.name + " " + attraction.location)}`} target="_blank" rel="noopener noreferrer" className="p-3 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors">
+                      <MapPin className="w-5 h-5" />
+                    </a>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-
-        {/* Empty State */}
-        {filteredAttractions.length === 0 && (
-          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-            <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl mb-2 text-gray-900">
-              Nicio atracție găsită
-            </h3>
-            <p className="text-gray-600">
-              Încearcă să modifici filtrele sau termenii de căutare
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

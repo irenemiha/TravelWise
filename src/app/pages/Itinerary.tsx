@@ -1,398 +1,106 @@
 import { useParams, Link } from "react-router";
-import {
-  Calendar,
-  MapPin,
-  Clock,
-  DollarSign,
-  Download,
-  Share2,
-  ChevronRight,
-  Coffee,
-  Utensils,
-  Camera,
-} from "lucide-react";
+import { toast } from "sonner";
+import { useState, useEffect } from "react";
+import { Calendar, MapPin, Clock, DollarSign, Download, Share2, Coffee, Utensils, Camera, Trash2, Edit2, X, ArrowLeft, Map as MapIcon, Loader2 } from "lucide-react";
 import { ImageWithFallback } from "../components/figma/ImageWithFallback";
-
-interface ItineraryDay {
-  date: string;
-  day: number;
-  activities: Activity[];
-}
-
-interface Activity {
-  id: string;
-  time: string;
-  name: string;
-  description: string;
-  duration: string;
-  price: string;
-  image: string;
-  type: "attraction" | "meal" | "transport" | "break";
-  location: string;
-}
-
-const mockItinerary: ItineraryDay[] = [
-  {
-    date: "15 Iunie 2026",
-    day: 1,
-    activities: [
-      {
-        id: "1",
-        time: "09:00",
-        name: "Turnul Eiffel",
-        description: "Vizită la simbolul iconic al Parisului",
-        duration: "2.5 ore",
-        price: "€26",
-        image:
-          "https://images.unsplash.com/photo-1642947392578-b37fbd9a4d45?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlaWZmZWwlMjB0b3dlciUyMHBhcmlzJTIwZnJhbmNlfGVufDF8fHx8MTc3NDE5MDc4NXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-        type: "attraction",
-        location: "Champ de Mars",
-      },
-      {
-        id: "2",
-        time: "12:00",
-        name: "Prânz la Café de l'Homme",
-        description: "Restaurant cu vedere spre Turnul Eiffel",
-        duration: "1.5 ore",
-        price: "€45",
-        image:
-          "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXJpcyUyMHJlc3RhdXJhbnR8ZW58MXx8fHwxNzc0MjcyNDc4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-        type: "meal",
-        location: "Trocadéro",
-      },
-      {
-        id: "3",
-        time: "14:30",
-        name: "Muzeul Luvru",
-        description: "Explorează colecțiile de artă celebre",
-        duration: "3 ore",
-        price: "€17",
-        image:
-          "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsb3V2cmUlMjBtdXNldW18ZW58MXx8fHwxNzc0MjcyNDc4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-        type: "attraction",
-        location: "Rue de Rivoli",
-      },
-      {
-        id: "4",
-        time: "18:00",
-        name: "Pauză de cafea",
-        description: "Relaxare la un café parizian autentic",
-        duration: "1 oră",
-        price: "€8",
-        image:
-          "https://images.unsplash.com/photo-1514933651103-005eec06c04b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXJpcyUyMGNhZmV8ZW58MXx8fHwxNzc0MjcyNDc4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-        type: "break",
-        location: "Le Marais",
-      },
-    ],
-  },
-  {
-    date: "16 Iunie 2026",
-    day: 2,
-    activities: [
-      {
-        id: "5",
-        time: "10:00",
-        name: "Arc de Triomphe",
-        description: "Monument istoric și vedere panoramică",
-        duration: "1.5 ore",
-        price: "€13",
-        image:
-          "https://images.unsplash.com/photo-1549144511-f099e773c147?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhcmMlMjBkZSUyMHRyaW9tcGhlfGVufDF8fHx8MTc3NDI3MjQ3OHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-        type: "attraction",
-        location: "Place Charles de Gaulle",
-      },
-      {
-        id: "6",
-        time: "12:00",
-        name: "Plimbare pe Champs-Élysées",
-        description: "Shopping și sightseeing",
-        duration: "2 ore",
-        price: "€0",
-        image:
-          "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaGFtcHMlMjBlbHlzZWVzfGVufDF8fHx8MTc3NDI3MjQ3OHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-        type: "attraction",
-        location: "Champs-Élysées",
-      },
-      {
-        id: "7",
-        time: "14:30",
-        name: "Prânz tradițional francez",
-        description: "Bucătărie franceză autentică",
-        duration: "2 ore",
-        price: "€55",
-        image:
-          "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmcmVuY2glMjBmb29kfGVufDF8fHx8MTc3NDI3MjQ3OHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-        type: "meal",
-        location: "Saint-Germain-des-Prés",
-      },
-      {
-        id: "8",
-        time: "17:00",
-        name: "Catedrala Notre-Dame",
-        description: "Arhitectură gotică impresionantă",
-        duration: "1.5 ore",
-        price: "Gratuit",
-        image:
-          "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxub3RyZSUyMGRhbWUlMjBwYXJpc3xlbnwxfHx8fDE3NzQyNzI0Nzh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-        type: "attraction",
-        location: "Île de la Cité",
-      },
-    ],
-  },
-  {
-    date: "17 Iunie 2026",
-    day: 3,
-    activities: [
-      {
-        id: "9",
-        time: "09:30",
-        name: "Sacré-Cœur",
-        description: "Bazilică pe dealul Montmartre",
-        duration: "2 ore",
-        price: "Gratuit",
-        image:
-          "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwyfHxzYWNyZSUyMGNvZXVyfGVufDF8fHx8MTc3NDI3MjQ3OHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-        type: "attraction",
-        location: "Montmartre",
-      },
-      {
-        id: "10",
-        time: "12:00",
-        name: "Explorare Montmartre",
-        description: "Cartier artistic cu străzi pitorești",
-        duration: "2.5 ore",
-        price: "€0",
-        image:
-          "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb250bWFydHJlJTIwcGFyaXN8ZW58MXx8fHwxNzc0MjcyNDc4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-        type: "attraction",
-        location: "Montmartre",
-      },
-    ],
-  },
-];
+import { ConfirmDialog } from "../components/ConfirmDialog";
+import { db, auth } from "../../firebase";
+import { doc, onSnapshot, collection, query, orderBy, deleteDoc, updateDoc } from "firebase/firestore";
 
 export function Itinerary() {
   const { id } = useParams();
+  const tripId = id || "";
+  const [trip, setTrip] = useState<any>(null);
+  const [itinerary, setItinerary] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState<any>({ isOpen: false });
 
-  const getActivityIcon = (type: Activity["type"]) => {
-    switch (type) {
-      case "meal":
-        return <Utensils className="w-5 h-5" />;
-      case "break":
-        return <Coffee className="w-5 h-5" />;
-      case "attraction":
-        return <Camera className="w-5 h-5" />;
-      default:
-        return <MapPin className="w-5 h-5" />;
-    }
+  useEffect(() => {
+    if (!tripId) return;
+    const unsubTrip = onSnapshot(doc(db, "trips", tripId), (snap) => {
+      if (snap.exists()) {
+        setTrip(snap.data());
+        if (auth.currentUser?.uid === snap.data().ownerId) setIsAdmin(true);
+      }
+    });
+
+    const unsubItin = onSnapshot(query(collection(db, "trips", tripId, "itinerary"), orderBy("time", "asc")), (snap) => {
+      const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const grouped: any = {};
+      all.forEach((act: any) => {
+        if (!grouped[act.day]) grouped[act.day] = [];
+        grouped[act.day].push(act);
+      });
+      setItinerary(Object.keys(grouped).map(day => ({ day: parseInt(day), activities: grouped[day] })).sort((a, b) => a.day - b.day));
+      setLoading(false);
+    });
+
+    return () => { unsubTrip(); unsubItin(); };
+  }, [tripId]);
+
+  const openMap = () => {
+    const cityName = trip?.destination?.split(',')[0].trim();
+    const locs = itinerary.flatMap(d => d.activities.map((a: any) => `${a.location}, ${cityName}`));
+    if (locs.length < 2) return toast.error("Prea puține locații.");
+    window.open(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(locs[0])}&destination=${encodeURIComponent(locs[locs.length-1])}&waypoints=${locs.slice(1,-1).join('|')}&travelmode=walking`, '_blank');
   };
 
-  const getActivityColor = (type: Activity["type"]) => {
-    switch (type) {
-      case "meal":
-        return "bg-orange-100 text-orange-700";
-      case "break":
-        return "bg-purple-100 text-purple-700";
-      case "attraction":
-        return "bg-blue-100 text-blue-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
-  };
-
-  const totalCost = mockItinerary.reduce(
-    (acc, day) =>
-      acc +
-      day.activities.reduce((dayAcc, activity) => {
-        const price = activity.price.replace(/[€,]/g, "");
-        return dayAcc + (price === "Gratuit" ? 0 : parseFloat(price) || 0);
-      }, 0),
-    0
-  );
+  if (loading) return <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950"><Loader2 className="animate-spin text-blue-600" /></div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-8">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-            <div>
-              <Link
-                to={`/trip/${id}`}
-                className="text-blue-100 hover:text-white mb-2 inline-block"
-              >
-                ← Înapoi la călătorie
-              </Link>
-              <h1 className="text-3xl sm:text-4xl mb-2">
-                Itinerariu Paris Adventure
-              </h1>
-              <p className="text-blue-100">
-                Planul tău personalizat pentru 15-22 Iunie 2026
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <button className="bg-white font-bold bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors flex items-center gap-2">
-                <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Export PDF</span>
+    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors duration-300 pb-24">
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        
+        <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 text-center md:text-left">
+           <div>
+              <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tighter uppercase">Itinerariu {trip?.destination?.split(',')[0]}</h1>
+              <p className="text-gray-500 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Planul tău de aventură sincronizat</p>
+           </div>
+           <div className="flex gap-3">
+              <button onClick={() => toast.success("Salvat offline!")} className="p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-md text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-all border border-gray-100 dark:border-gray-800"><Download className="w-5 h-5" /></button>
+              <button onClick={openMap} className="bg-blue-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-blue-500/20 flex items-center gap-2 hover:bg-blue-700 transition-all">
+                <MapIcon className="w-4 h-4" /> Vezi Ruta
               </button>
-              <button className="bg-white font-bold bg-opacity-20 backdrop-blur-sm px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors flex items-center gap-2">
-                <Share2 className="w-4 h-4" />
-                <span className="hidden sm:inline">Distribuie</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        {/* Summary Cards */}
-        <div className="grid sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-gray-600">Total zile</div>
-              <Calendar className="w-5 h-5 text-blue-600" />
-            </div>
-            <div className="text-3xl text-gray-900">
-              {mockItinerary.length}
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-gray-600">Total activități</div>
-              <MapPin className="w-5 h-5 text-purple-600" />
-            </div>
-            <div className="text-3xl text-gray-900">
-              {mockItinerary.reduce((acc, day) => acc + day.activities.length, 0)}
-            </div>
-          </div>
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-gray-600">Cost estimat</div>
-              <DollarSign className="w-5 h-5 text-green-600" />
-            </div>
-            <div className="text-3xl text-gray-900">
-              €{totalCost.toFixed(0)}
-            </div>
-            <div className="text-sm text-gray-500 mt-1">
-              ~€{(totalCost / 6).toFixed(0)} / persoană
-            </div>
-          </div>
+           </div>
         </div>
 
-        {/* Itinerary Timeline */}
-        <div className="space-y-8">
-          {mockItinerary.map((day, dayIndex) => (
-            <div key={day.day} className="bg-white rounded-xl shadow-sm overflow-hidden">
-              {/* Day Header */}
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm text-blue-100 mb-1">
-                      Ziua {day.day}
-                    </div>
-                    <h2 className="text-2xl">{day.date}</h2>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm text-blue-100">
-                      {day.activities.length} activități
-                    </div>
-                    <div className="text-xl">
-                      {day.activities[0].time} - {day.activities[day.activities.length - 1].time}
-                    </div>
-                  </div>
-                </div>
+        <div className="space-y-16">
+          {itinerary.map((day) => (
+            <div key={day.day} className="relative">
+              <div className="flex items-center gap-4 mb-8">
+                 <div className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black px-6 py-2 rounded-xl text-xs uppercase tracking-widest shadow-xl">Ziua {day.day}</div>
+                 <div className="h-[2px] flex-1 bg-gray-200 dark:bg-gray-800" />
               </div>
 
-              {/* Activities */}
-              <div className="p-6">
-                <div className="space-y-6">
-                  {day.activities.map((activity, activityIndex) => (
-                    <div key={activity.id} className="relative">
-                      {/* Timeline connector */}
-                      {activityIndex < day.activities.length - 1 && (
-                        <div className="absolute left-6 top-14 bottom-0 w-0.5 bg-gray-200 -mb-6" />
-                      )}
-
-                      <div className="flex gap-4">
-                        {/* Time */}
-                        <div className="flex flex-col items-center flex-shrink-0">
-                          <div
-                            className={`w-12 h-12 rounded-full ${getActivityColor(
-                              activity.type
-                            )} flex items-center justify-center relative z-10`}
-                          >
-                            {getActivityIcon(activity.type)}
-                          </div>
-                          <div className="text-sm text-gray-600 mt-2 whitespace-nowrap">
-                            {activity.time}
-                          </div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors">
-                          <div className="flex flex-col sm:flex-row gap-4">
-                            <div className="w-full sm:w-32 h-32 rounded-lg overflow-hidden flex-shrink-0">
-                              <ImageWithFallback
-                                src={activity.image}
-                                alt={activity.name}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="text-lg mb-1 text-gray-900">
-                                {activity.name}
-                              </h3>
-                              <p className="text-sm text-gray-600 mb-3">
-                                {activity.description}
-                              </p>
-                              <div className="flex flex-wrap gap-3 text-sm text-gray-600">
-                                <div className="flex items-center gap-1">
-                                  <MapPin className="w-4 h-4" />
-                                  {activity.location}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Clock className="w-4 h-4" />
-                                  {activity.duration}
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <DollarSign className="w-4 h-4" />
-                                  {activity.price}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+              <div className="space-y-6">
+                {day.activities.map((act: any) => (
+                  <div key={act.id} className="bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-100 dark:border-gray-800 overflow-hidden shadow-sm hover:shadow-xl transition-all group flex flex-col md:flex-row">
+                    <div className="w-full md:w-64 h-48 relative overflow-hidden">
+                      <ImageWithFallback src={act.image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                      <div className="absolute top-4 left-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl font-black text-[9px] uppercase tracking-widest text-blue-600">{act.time}</div>
+                    </div>
+                    <div className="p-8 flex-1 flex flex-col justify-center">
+                      <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-2">{act.name}</h3>
+                      <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-sm mb-6"><MapPin className="w-4 h-4" /> {act.location}</div>
+                      
+                      <div className="flex items-center gap-8 pt-6 border-t border-gray-50 dark:border-gray-800">
+                         <div className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest"><Clock className="w-4 h-4 text-purple-500" /> {act.duration}</div>
+                         <div className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase tracking-widest"><DollarSign className="w-4 h-4 text-green-500" /> {act.price}</div>
+                         {isAdmin && (
+                           <button onClick={() => setDeleteDialog({ isOpen: true, id: act.id })} className="ml-auto p-2 text-gray-300 hover:text-red-500 transition-colors"><Trash2 className="w-5 h-5" /></button>
+                         )}
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
         </div>
-
-        {/* Next Steps CTA */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg p-8 text-white mt-8 text-center">
-          <h2 className="text-2xl sm:text-3xl mb-4">
-            Itinerarul tău este gata!
-          </h2>
-          <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-            Acum poți descărca itinerarul, distribui cu grupul sau începe să
-            faci rezervări pentru activitățile planificate.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white font-bold text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
-              <Download className="w-5 h-5" />
-              Descarcă itinerarul
-            </button>
-            <button className="bg-white font-bold bg-opacity-20 backdrop-blur-sm px-6 py-3 rounded-lg hover:bg-opacity-30 transition-colors flex items-center justify-center gap-2">
-              Începe rezervările
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
       </div>
+
+      <ConfirmDialog isOpen={deleteDialog.isOpen} title="Șterge Activitate" message="Sigur vrei să elimini acest punct din program?" onConfirm={async () => { await deleteDoc(doc(db, "trips", tripId, "itinerary", deleteDialog.id)); setDeleteDialog({ isOpen: false }); }} onCancel={() => setDeleteDialog({ isOpen: false })} />
     </div>
   );
 }
