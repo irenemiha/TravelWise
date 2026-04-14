@@ -4,9 +4,17 @@
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>TravelWise</title>
-      <script type="module" crossorigin src="/assets/index-DgI1sw09.js"></script>
-      <link rel="stylesheet" crossorigin href="/assets/index-Cdr7HxAu.css">
+      <title>TravelWise Website</title>
+      <script>
+        // Verificăm dacă userul a ales deja o temă sau dacă preferă dark mode din sistem
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark')
+        } else {
+          document.documentElement.classList.remove('dark')
+        }
+      </script>
+      <script type="module" crossorigin src="/assets/index-W_Gp1CEB.js"></script>
+      <link rel="stylesheet" crossorigin href="/assets/index-BhpCMhJw.css">
     </head>
 
     <body>

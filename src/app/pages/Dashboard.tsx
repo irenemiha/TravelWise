@@ -234,7 +234,7 @@ export function Dashboard() {
 
               <div className="flex border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
                 <Link 
-                  to={`/chat/${trip.id}`} 
+                  to={`/trip-chat/${trip.id}`} 
                   className="flex-1 py-5 flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400 font-black text-[10px] uppercase tracking-widest hover:bg-white dark:hover:bg-gray-800 transition-colors"
                 >
                   <MessageCircle className="w-5 h-5" /> 

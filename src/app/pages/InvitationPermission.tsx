@@ -1,70 +1,131 @@
 import { useNavigate, useParams } from "react-router";
-import { ChevronLeft, Check, Loader2, Users2, ShieldCheck } from "lucide-react";
+import { ChevronLeft, Check, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+
+// IMPORTURI FIREBASE
 import { db } from "../../firebase";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 
 export function InvitationPermissions() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const tripId = id || "";
+
   const [selected, setSelected] = useState("admin");
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [trip, setTrip] = useState<{ name: string } | null>(null);
 
+  const options = [
+    { id: "all", title: "Oricine din grup", desc: "Toți membrii pot invita persoane noi." },
+    { id: "admin", title: "Doar Administratorii", desc: "Doar tu și ceilalți admini puteți trimite invitații." },
+  ];
+
+  // 1. ASCULTĂM SETĂRILE DIN FIRESTORE ÎN TIMP REAL
   useEffect(() => {
-    if (!id) return;
-    const unsub = onSnapshot(doc(db, "trips", id), (snap) => {
-      if (snap.exists()) setSelected(snap.data().invitationPolicy || "admin");
+    if (!tripId) return;
+
+    const tripRef = doc(db, "trips", tripId);
+    const unsubscribe = onSnapshot(tripRef, (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        // DEFINIREA VARIABILEI TRIP AICI:
+        setTrip(data as any);
+        setSelected(data.invitationPolicy || "admin");
+      }
       setLoading(false);
     });
-    return () => unsub();
-  }, [id]);
 
-  const handleSelect = async (optId: string) => {
-    if (!id || isUpdating) return;
+    return () => unsubscribe();
+  }, [tripId]);
+
+  // 2. SALVĂM SCHIMBAREA CU FEEDBACK VIZUAL (isUpdating)
+  const handleSelect = async (optionId: string) => {
+    if (!tripId || isUpdating) return;
+    
     setIsUpdating(true);
     try {
-      await updateDoc(doc(db, "trips", id), { invitationPolicy: optId });
+      const tripRef = doc(db, "trips", tripId);
+      await updateDoc(tripRef, {
+        invitationPolicy: optionId
+      });
       toast.success("Permisiuni actualizate!");
-    } catch (e) { toast.error("Eroare server."); } finally { setIsUpdating(false); }
+    } catch (error) {
+      console.error("Error updating permissions:", error);
+      toast.error("Nu s-au putut salva setările.");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen p-6">
-      <div className="max-w-2xl mx-auto py-12">
-        <div className="bg-white dark:bg-gray-900 rounded-[3rem] p-10 shadow-xl border border-gray-100 dark:border-gray-800">
-          <div className="flex items-center gap-4 mb-10">
-             <button onClick={() => navigate(-1)} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-xl"><ChevronLeft className="w-5 h-5" /></button>
-             <h1 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Cine poate invita?</h1>
-          </div>
+    <div className="bg-gray-50 dark:bg-gray-950 transition-colors duration-300 min-h-screen">
+      {/* Header - Sincronizat cu stilul aplicației */}
+      <div className="bg-white dark:bg-gray-900 p-4 flex items-center border-b dark:border-gray-800 sticky top-0 z-10 transition-colors">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-all"
+        >
+          <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-white" />
+        </button>
+        <div className="ml-4">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight leading-none">Permisiuni Invitație</h1>
+          <p className="text-xs text-blue-600 dark:text-blue-400 font-bold mt-1 uppercase tracking-widest leading-none">{trip?.name}</p>
+        </div>
+      </div>
 
-          <div className="grid gap-4">
-            {[
-              { id: "all", title: "Oricine din grup", desc: "Toți membrii pot genera link-uri de invitație.", icon: Users2 },
-              { id: "admin", title: "Doar Administratorii", desc: "Doar persoana care a creat grupul poate invita membri.", icon: ShieldCheck }
-            ].map((opt) => (
-              <button 
-                key={opt.id} onClick={() => handleSelect(opt.id)}
-                className={`w-full p-8 rounded-3xl border-2 text-left transition-all relative overflow-hidden group ${selected === opt.id ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-50 dark:border-gray-800 bg-white dark:bg-gray-900'}`}
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-4">
-                    <div className={`p-4 rounded-2xl ${selected === opt.id ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}`}>
-                      <opt.icon className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h3 className={`text-xl font-black mb-1 ${selected === opt.id ? 'text-blue-700 dark:text-blue-400' : 'text-gray-900 dark:text-white'}`}>{opt.title}</h3>
-                      <p className="text-sm text-gray-500 font-medium">{opt.desc}</p>
-                    </div>
+      <div className="p-6 space-y-3 max-w-md mx-auto py-10">
+        <p className="text-xs font-black text-gray-400 dark:text-gray-500 tracking-widest uppercase ml-1 mb-6">
+          Cine poate trimite link-uri?
+        </p>
+        
+        {/* Container Opțiuni cu feedback la update */}
+        <div className={`transition-opacity duration-300 ${isUpdating ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
+          {options.map((opt) => (
+            <button 
+              key={opt.id}
+              onClick={() => handleSelect(opt.id)}
+              className={`w-full p-6 rounded-[24px] border text-left transition-all active:scale-[0.98] mb-4 last:mb-0 ${
+                selected === opt.id 
+                  ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-500 shadow-lg shadow-blue-500/5' 
+                  : 'border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-none'
+              }`}
+            >
+              <div className="flex justify-between items-center mb-1">
+                <span className={`font-black text-lg ${
+                  selected === opt.id 
+                    ? 'text-blue-700 dark:text-blue-400' 
+                    : 'text-gray-900 dark:text-gray-100'
+                }`}>
+                  {opt.title}
+                </span>
+                {selected === opt.id && (
+                  <div className="bg-blue-600 dark:bg-blue-500 p-1.5 rounded-full shadow-md">
+                    <Check className="w-4 h-4 text-white" />
                   </div>
-                  {selected === opt.id && <div className="bg-blue-600 p-1.5 rounded-full"><Check className="w-4 h-4 text-white" /></div>}
-                </div>
-              </button>
-            ))}
-          </div>
+                )}
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">
+                {opt.desc}
+              </p>
+            </button>
+          ))}
+        </div>
+
+        {/* Box informativ de la final */}
+        <div className="mt-10 p-5 bg-gray-100 dark:bg-gray-900/50 rounded-[2rem] border border-dashed border-gray-300 dark:border-gray-700 transition-colors">
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center italic leading-relaxed font-medium">
+            Această setare poate fi modificată oricând de către administratorii călătoriei pentru a controla cine are acces în grup.
+          </p>
         </div>
       </div>
     </div>

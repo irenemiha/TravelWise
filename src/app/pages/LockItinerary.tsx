@@ -2,6 +2,8 @@ import { useNavigate, useParams } from "react-router";
 import { ChevronLeft, Lock, Unlock, Loader2, ShieldAlert } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+
+// IMPORTURI FIREBASE
 import { db, auth } from "../../firebase";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
@@ -9,63 +11,130 @@ import { onAuthStateChanged } from "firebase/auth";
 export function LockItinerary() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const tripId = id || "";
+
   const [isLocked, setIsLocked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
+  const [trip, setTrip] = useState<{ name: string } | null>(null);
 
+  // 1. PROTECȚIE RUTĂ + ASCULTARE FIRESTORE (STATUS + NUME)
   useEffect(() => {
     const unsubAuth = onAuthStateChanged(auth, (user) => {
       if (!user) navigate("/");
       else setAuthLoading(false);
     });
-    if (!id) return;
-    const unsubData = onSnapshot(doc(db, "trips", id), (snap) => {
-      if (snap.exists()) setIsLocked(snap.data().isLocked ?? false);
+
+    if (!tripId) return;
+
+    const tripRef = doc(db, "trips", tripId);
+    const unsubscribe = onSnapshot(tripRef, (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        setTrip(data as { name: string });
+        setIsLocked(data.isLocked ?? false);
+      }
       setLoading(false);
     });
-    return () => { unsubAuth(); unsubData(); };
-  }, [id, navigate]);
 
+    return () => {
+      unsubAuth();
+      unsubscribe();
+    };
+  }, [tripId, navigate]);
+
+  // 2. LOGICA DE TOGGLE REALĂ
   const handleToggle = async () => {
+    if (!tripId) return;
+
+    const newState = !isLocked;
     setIsUpdating(true);
+
     try {
-      await updateDoc(doc(db, "trips", id!), { isLocked: !isLocked });
-      toast.success(!isLocked ? "Itinerariu blocat!" : "Itinerariu deblocat!");
-    } catch (e) { toast.error("Eroare la salvare."); } finally { setIsUpdating(false); }
+      const tripRef = doc(db, "trips", tripId);
+      await updateDoc(tripRef, {
+        isLocked: newState
+      });
+      
+      toast.success(newState ? "Itinerariu blocat cu succes!" : "Itinerariu deblocat pentru editare!");
+    } catch (error) {
+      console.error("Lock toggle error:", error);
+      toast.error("Nu s-a putut schimba starea itinerariului.");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
-  if (authLoading || loading) return null;
+  if (authLoading || loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors p-6">
-      <div className="max-w-2xl mx-auto py-12">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-500 hover:text-blue-600 mb-8 font-black uppercase text-[10px] tracking-widest">
-          <ChevronLeft className="w-4 h-4" /> Înapoi
+    <div className="bg-gray-50 dark:bg-gray-950 transition-colors duration-300 min-h-screen">
+      {/* Header - Stil Unificat */}
+      <div className="bg-white dark:bg-gray-900 p-4 flex items-center border-b dark:border-gray-800 sticky top-0 z-10 transition-colors">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-2xl transition-all"
+        >
+          <ChevronLeft className="w-6 h-6 text-gray-900 dark:text-white" />
         </button>
-
-        <div className="bg-white dark:bg-gray-900 rounded-[3rem] p-12 text-center shadow-xl border border-gray-100 dark:border-gray-800">
-          <div className={`w-24 h-24 rounded-[2rem] mx-auto flex items-center justify-center mb-8 transition-all duration-500 shadow-2xl ${isLocked ? 'bg-red-600 text-white scale-110' : 'bg-green-100 dark:bg-green-900/30 text-green-600'}`}>
-            {isLocked ? <Lock className="w-12 h-12" /> : <Unlock className="w-12 h-12" />}
-          </div>
-          
-          <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-4 uppercase tracking-tighter">
-            {isLocked ? "Itinerariu Blocat" : "Itinerariu Deschis"}
+        <div className="ml-4">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white transition-colors leading-none tracking-tighter">
+            Blochează Itinerariul
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mb-10 font-medium max-w-sm mx-auto">
-            {isLocked 
-              ? "Modul de editare este dezactivat pentru toți membrii. Nimeni nu mai poate adăuga sau schimba activități." 
-              : "Toți membrii pot propune, vota sau șterge elemente din planul de călătorie."}
-          </p>
+          <p className="text-xs text-blue-600 dark:text-blue-400 font-bold mt-1 uppercase tracking-widest leading-none">{trip?.name}</p>
+        </div>
+      </div>
 
-          <div className="bg-amber-50 dark:bg-amber-900/20 p-6 rounded-3xl flex gap-4 text-left mb-10 border border-amber-100 dark:border-amber-800">
-            <ShieldAlert className="w-6 h-6 text-amber-600 shrink-0" />
-            <p className="text-sm text-amber-800 dark:text-amber-200 font-bold">Această funcție asigură faptul că planul final rămâne neschimbat înainte de plecare.</p>
-          </div>
+      <div className="p-6 flex flex-col items-center text-center max-w-md mx-auto py-10">
+        {/* Status Icon Container - Stil Aplicație */}
+        <div className={`p-10 rounded-[2.5rem] mb-8 transition-all duration-500 transform shadow-2xl ${
+          isLocked 
+            ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 scale-110' 
+            : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 scale-100'
+        }`}>
+          {isLocked ? <Lock className="w-16 h-16" /> : <Unlock className="w-16 h-16" />}
+        </div>
+        
+        <h2 className="text-2xl font-black mb-3 text-gray-900 dark:text-white transition-colors uppercase tracking-tight">
+          {isLocked ? "Itinerariu Blocat" : "Itinerariu Deschis"}
+        </h2>
+        
+        <p className="text-gray-500 dark:text-gray-400 mb-10 transition-colors leading-relaxed font-medium">
+          {isLocked 
+            ? "Modul de editare este dezactivat. Nimeni nu mai poate adăuga, vota sau șterge activități din planul curent." 
+            : "Toți membrii grupului au permisiunea de a propune locații noi și de a vota destinațiile preferate."}
+        </p>
 
-          <button onClick={handleToggle} disabled={isUpdating} className={`w-full py-5 rounded-2xl font-black uppercase text-xs tracking-widest transition-all active:scale-95 text-white shadow-xl ${isLocked ? 'bg-green-600' : 'bg-red-600'}`}>
-            {isUpdating ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : isLocked ? "Deblochează Itinerariul" : "Blochează Itinerariul"}
-          </button>
+        {/* Toggle Action Button */}
+        <button 
+          onClick={handleToggle}
+          disabled={isUpdating}
+          className={`w-full py-5 rounded-2xl font-bold text-white shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 ${
+            isLocked 
+              ? 'bg-green-600 shadow-green-600/20' 
+              : 'bg-red-600 shadow-red-600/20'
+          } disabled:opacity-50`}
+        >
+          {isUpdating ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            isLocked ? "Deblochează pentru Editare" : "Blochează Itinerariul"
+          )}
+        </button>
+        
+        {/* Note Box - Stil Website */}
+        <div className="mt-10 p-6 bg-amber-50 dark:bg-amber-900/10 rounded-3xl border border-amber-100 dark:border-amber-900/30 transition-colors flex gap-4 text-left">
+           <ShieldAlert className="w-6 h-6 text-amber-600 shrink-0" />
+           <p className="text-sm text-amber-800 dark:text-amber-200 font-medium leading-relaxed">
+             <strong>Notă:</strong> Această funcție asigură faptul că planul final rămâne neschimbat înainte de plecare. Membrii pot vizualiza în continuare totul.
+           </p>
         </div>
       </div>
     </div>
