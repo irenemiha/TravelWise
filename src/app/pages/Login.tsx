@@ -21,9 +21,9 @@ export function Login() {
     // Ascultăm starea de auth. Când Google ne trimite înapoi, 
     // acest listener va prinde user-ul imediat ce Firebase îl procesează.
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        navigate("/dashboard");
-      }
+      if (user && localStorage.getItem("isAdminLoggedIn") !== "true") {
+      navigate("/dashboard");
+    }
     });
     return () => unsubscribe();
   }, [navigate]);
@@ -31,6 +31,15 @@ export function Login() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    // if (email === "admin@travelwise.com" && password === "admin") {
+    //   localStorage.setItem("isAdminLoggedIn", "true");
+    //   toast.success("Logat ca Admin!");
+    //   navigate("/admin-dashboard");
+    //   setLoading(false);
+    //   return;
+    // }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast.success("Bine ai revenit!");

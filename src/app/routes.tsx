@@ -1,4 +1,7 @@
 import { createBrowserRouter } from "react-router";
+import { AdminDashboard } from './pages/AdminDashboard';
+import { AdminUsers } from './pages/AdminUsers';
+import { AdminTrips } from './pages/AdminTrips';
 import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
 import { TripPlanning } from "./pages/TripPlanning";
@@ -30,6 +33,9 @@ export const router = createBrowserRouter([
     Component: Root,
     children: [
       { index: true, Component: Home },
+      { path: "/admin-dashboard", Component: AdminDashboard },
+      { path: "/admin-users", Component: AdminUsers },
+      { path: "/admin-trips", Component: AdminTrips },
       { path: "dashboard", Component: Dashboard },
       { path: "trip/:id", Component: TripPlanning },
       { path: "explore/:id", Component: Explore },
